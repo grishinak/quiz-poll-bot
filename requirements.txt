@@ -1,5 +1,6 @@
 aiogram==3.14.0
+aiosqlite
 black
 pre-commit
 python-dotenv
-#sqlalchemy aiosqlite for future db
+sqlalchemy
