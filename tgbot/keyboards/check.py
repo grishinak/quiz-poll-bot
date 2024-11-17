@@ -1,4 +1,9 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+)
 
 check_menu = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -9,4 +14,11 @@ check_menu = InlineKeyboardMarkup(
             ),
         ]
     ]
+)
+
+save_menu = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Сохранить опрос.")]],
+    resize_keyboard=True,
+    input_field_placeholder="Нажмите на кнопку ...",
+    one_time_keyboard=True,
 )

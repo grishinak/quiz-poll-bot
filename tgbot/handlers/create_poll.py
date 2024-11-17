@@ -64,16 +64,17 @@ async def process_check_false(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "check_true")
 async def process_check_true(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Успешно")  # alert
-    await callback.message.answer("Данные верны.")  # message in chat
-
+    await callback.message.answer(
+        "Данные верны.", reply_markup=kb.save_menu
+    )  # message in chat
     await state.set_state(CreatePoll.correct)  # goes to state
-    data = await state.get_data()  # TODO: need to save to db
-    await callback.message.answer("Данные опроса сохранены!")
 
 
 @router.message(CreatePoll.correct)
-async def process_correct(message: Message, state: FSMContext):
-    await state.update_data(question=message.text)
-    await state.set_state(CreatePoll.answer)
-    await message.answer("Опрос успешно создан!")
+async def process_correct(
+    message: Message, state: FSMContext
+):  # waiting for message need to do a reply
+    data = await state.get_data()  # TODO: need to save to db
+    await message.answer("Данные опроса сохранены!")
+    await message.answer(f"Опрос  успешно создан!")
     await state.clear()
