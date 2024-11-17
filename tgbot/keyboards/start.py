@@ -1,11 +1,11 @@
 from aiogram.types import (
     InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    ReplyKeyboardMarkup,
-    KeyboardButton,
+    InlineKeyboardButton,  # ,
+    # ReplyKeyboardMarkup,
+    # KeyboardButton,
 )
 
-menu = InlineKeyboardMarkup(
+start_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="Создать опрос", callback_data="create_poll")]
     ]

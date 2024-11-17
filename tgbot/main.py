@@ -8,7 +8,7 @@ from aiogram import Bot, Dispatcher
 
 # importing all routers
 from handlers.handler import router as handler_router
-from handlers.states import router as fsm_router
+from handlers.create_poll import router as create_poll_router
 
 
 async def main():
@@ -17,7 +17,7 @@ async def main():
     dp = Dispatcher()
     for router in [
         handler_router,
-        fsm_router,
+        create_poll_router,
     ]:
         dp.include_router(router)
     await dp.start_polling(bot)

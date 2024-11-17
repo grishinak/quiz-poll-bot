@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery
 
-import keyboards.keyboard as kb
+import keyboards.start as kb
 
 router = Router()
 
@@ -15,7 +15,7 @@ help_text = "Список команд:\n/start - инициализация б�
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     """Answer start message with greeting from `start_text`"""
-    await message.answer(start_text, reply_markup=kb.menu)
+    await message.answer(start_text, reply_markup=kb.start_menu)
 
 
 @router.message(Command("help"))
