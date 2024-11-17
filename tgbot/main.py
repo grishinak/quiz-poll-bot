@@ -8,7 +8,7 @@ from aiogram import Bot, Dispatcher
 
 # importing all routers
 from handlers.handler import router as handler_router
-from handlers.fsm import router as fsm_router
+from handlers.states import router as fsm_router
 
 
 async def main():

@@ -1,15 +1,15 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 import keyboards.keyboard as kb
 
 router = Router()
 
-start_text = """Hello! I can help you with poll organisation.\n ..."""
-help_text = (
-    "List of commands:\n/start - initialising bot.\n/help - get info about bot.\n ..."
+start_text = (
+    """С помощью этого бота Вы можете создать опрос с правильным ответом..\n ..."""
 )
+help_text = "Список команд:\n/start - инициализация бота.\n/help - получение информации о боте.\n ..."
 
 
 @router.message(CommandStart())
@@ -22,3 +22,15 @@ async def cmd_start(message: Message):
 async def cmd_help(message: Message):
     """Answer help message with info from `help_text`"""
     await message.answer(help_text)
+
+
+# #for repl
+# @router.message(F.data =="reply")
+# async def cmd_reply(message: Message):
+#     await message.message.answer("you chose reply mes")
+
+# #for inl
+# @router.callback_query(F.data =="reply")
+# async def cmd_reply(callback: CallbackQuery):
+#     await callback.answer("you chose to touch button reply")
+#     await callback.message.answer("you chose reply inl")
