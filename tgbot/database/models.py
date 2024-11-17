@@ -47,7 +47,7 @@ class Answer(Base):
     answer: Mapped[str] = mapped_column(String(250))
 
 
-#
+# create all models
 async def async_main():
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
