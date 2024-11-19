@@ -16,9 +16,9 @@ check_menu = InlineKeyboardMarkup(
     ]
 )
 
-save_menu = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text="Сохранить опрос.")]],
-    resize_keyboard=True,
-    input_field_placeholder="Нажмите на кнопку ...",
-    one_time_keyboard=True,
-)
+# save_menu = ReplyKeyboardMarkup(
+#     keyboard=[[KeyboardButton(text="Сохранить опрос.")]],
+#     resize_keyboard=True,
+#     input_field_placeholder="Нажмите на кнопку ...",
+#     one_time_keyboard=True,
+# )

@@ -7,7 +7,8 @@ import asyncio
 from aiogram import Bot, Dispatcher
 
 # importing all routers
-from handlers.handler import router as handler_router
+from handlers.start import router as start_router
+from handlers.help import router as help_router
 from handlers.create_poll import router as create_poll_router
 
 # db
@@ -20,7 +21,8 @@ async def main():
     bot = Bot(token=os.getenv("BOT_TOKEN"))
     dp = Dispatcher()
     for router in [
-        handler_router,
+        start_router,
+        help_router,
         create_poll_router,
     ]:
         dp.include_router(router)
