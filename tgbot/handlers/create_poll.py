@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
 from aiogram.fsm.state import StatesGroup, State
@@ -18,12 +19,21 @@ class CreatePoll(StatesGroup):
 
 # Обработка нажатия кнопки (from start) и переход в состояние
 @router.callback_query(F.data == "create_poll")
-async def process_create_poll(callback: CallbackQuery, state: FSMContext):
+async def process_create_poll_clb(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Вы начали создание опроса")  # alert
     await callback.message.answer("Вы начали создание опроса!")  # message in chat
 
     await state.set_state(CreatePoll.name)  # goes to state
     await callback.message.answer("Введите название опроса:")
+
+
+# Обработка команды и переход в состояние
+@router.message(Command("create_poll"))
+async def process_create_poll_cmd(message: Message, state: FSMContext):
+    await message.answer("Вы начали создание опроса!")  # message in chat
+
+    await state.set_state(CreatePoll.name)  # goes to state
+    await message.answer("Введите название опроса:")
 
 
 @router.message(CreatePoll.name)
