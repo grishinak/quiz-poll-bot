@@ -35,3 +35,26 @@ async def set_poll(name: str, question: str, answer: str, creator_id: int):
 
         # Фиксируем изменения в базе данных
         await session.commit()
+
+
+from sqlalchemy.future import select
+from database.models import Poll, async_session
+
+
+async def get_polls(user_id: int):
+    """
+    Получает список опросов, созданных пользователем.
+
+    :param user_id: ID пользователя Telegram
+    :return: Список словарей с данными опросов
+    """
+    async with async_session() as session:
+        async with session.begin():
+            # Выбираем только необходимые данные, чтобы избежать привязки к сессии
+            result = await session.execute(
+                select(Poll.id, Poll.name, Poll.question, Poll.answer).where(
+                    Poll.creator_id == user_id
+                )
+            )
+            # Возвращаем список кортежей, который можно использовать вне сессии
+            return result.all()
