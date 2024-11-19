@@ -8,7 +8,7 @@ import keyboards.create_poll as kb
 
 router = Router()
 
-
+# class with fsm states
 class CreatePoll(StatesGroup):
     name = State()
     question = State()
@@ -45,7 +45,7 @@ async def process_answer(message: Message, state: FSMContext):
     data = await state.get_data()  # get all data about poll from user
     await message.answer(
         f"Все ли верно?\n\nНазвание опроса: {data['name']}\nВопрос: {data['question']}\nОтвет: {data['answer']}",
-        reply_markup=kb.check_menu,
+        reply_markup=kb.check_menu,  # butons for check
     )
 
 
@@ -70,5 +70,4 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()  # TODO: need to save to db
     await callback.message.answer("Данные опроса сохранены!")
     await callback.message.answer(f"Опрос {data['name']} успешно создан!")
-
     await state.clear()

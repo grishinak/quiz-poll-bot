@@ -2,7 +2,7 @@ from database.models import async_session
 from database.models import User
 from sqlalchemy import select
 
-
+# func for setting user data from /start
 async def set_user(tg_id, first_name=None, last_name=None):
     async with async_session() as session:
         # Получаем пользователя из базы данных

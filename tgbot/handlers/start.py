@@ -1,4 +1,4 @@
-from aiogram import Router, F
+from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
@@ -6,10 +6,9 @@ import keyboards.start as kb
 import database.requests as rq
 
 router = Router()
-
 start_text = """С помощью этого бота Вы можете создать опрос с правильным ответом.\n"""
 
-
+# /start handler
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     """Answer start message with greeting from `start_text`"""
