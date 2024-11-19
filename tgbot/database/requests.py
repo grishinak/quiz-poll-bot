@@ -1,5 +1,5 @@
 from database.models import async_session
-from database.models import User
+from database.models import User, Poll
 from sqlalchemy import select
 
 # func for setting user data from /start
@@ -22,6 +22,15 @@ async def set_user(tg_id, first_name=None, last_name=None):
                 user.first_name = first_name
             if last_name:  # Проверяем, что передана фамилия
                 user.last_name = last_name
+
+        # Фиксируем изменения в базе данных
+        await session.commit()
+
+
+async def set_poll(name: str, question: str, answer: str, creator_id: int):
+    async with async_session() as session:
+        poll = Poll(name=name, question=question, answer=answer, creator_id=creator_id)
+        session.add(poll)
 
         # Фиксируем изменения в базе данных
         await session.commit()

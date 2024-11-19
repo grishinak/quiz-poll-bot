@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
+import database.requests as rq
 import keyboards.create_poll as kb
 
 router = Router()
@@ -68,6 +69,26 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Успешно")  # alert
     await callback.message.edit_text("Данные верны.")
     data = await state.get_data()  # TODO: need to save to db
-    await callback.message.answer("Данные опроса сохранены!")
-    await callback.message.answer(f"Опрос {data['name']} успешно создан!")
+
+    creator_id = callback.from_user.id
+    try:
+        # Сохраняем опрос в базе данных
+        poll_id = await rq.set_poll(
+            name=data["name"],
+            question=data["question"],
+            answer=data["answer"],
+            creator_id=creator_id,
+        )
+
+        # Отправляем сообщение пользователю о том, что опрос сохранен
+        await callback.message.answer(f"Данные опроса сохранены!")
+        await callback.message.answer(f"Опрос '{data['name']}' успешно создан.")
+
+    except Exception as e:
+        # Если произошла ошибка, информируем пользователя
+        await callback.message.answer(
+            "Произошла ошибка при сохранении опроса. Попробуйте снова."
+        )
+        print(f"Ошибка при сохранении опроса: {e}")
+
     await state.clear()
