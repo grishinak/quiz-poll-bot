@@ -37,10 +37,6 @@ async def set_poll(name: str, question: str, answer: str, creator_id: int):
         await session.commit()
 
 
-from sqlalchemy.future import select
-from database.models import Poll, async_session
-
-
 async def get_polls(user_id: int):
     """
     Получает список опросов, созданных пользователем.
@@ -58,3 +54,6 @@ async def get_polls(user_id: int):
             )
             # Возвращаем список кортежей, который можно использовать вне сессии
             return result.all()
+
+
+# TODO: delete users polls from db from user menu
