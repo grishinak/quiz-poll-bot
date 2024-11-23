@@ -1,5 +1,5 @@
 from database.models import async_session
-from database.models import User, Poll
+from database.models import User, Poll, Lobby
 from sqlalchemy import select
 
 # func for setting user data from /start
@@ -57,3 +57,32 @@ async def get_polls(user_id: int):
 
 
 # TODO: delete users polls from db from user menu
+
+
+# add lobby data to db from ???
+async def set_lobby(poll_id: int, creator_id: int):
+    async with async_session() as session:
+        lobby = Lobby(poll_id=poll_id, creator_id=creator_id)
+        session.add(lobby)
+
+        # Фиксируем изменения в базе данных
+        await session.commit()
+
+
+async def get_lobbies(user_id: int):
+    """
+    Получает список лобби, созданных пользователем.
+
+    :param user_id: ID пользователя Telegram
+    :return: Список словарей с данными лобби
+    """
+    async with async_session() as session:
+        async with session.begin():
+            # Выбираем только необходимые данные, чтобы избежать привязки к сессии
+            result = await session.execute(
+                select(Lobby.id, Lobby.poll_id, Lobby.creator_id).where(
+                    Lobby.creator_id == user_id
+                )
+            )
+            # Возвращаем список кортежей, который можно использовать вне сессии
+            return result.all()

@@ -11,6 +11,8 @@ from handlers.start import router as start_router
 from handlers.help import router as help_router
 from handlers.create_poll import router as create_poll_router
 from handlers.poll_list import router as poll_list_router
+from handlers.create_lobby import router as create_lobby_router
+from handlers.lobbies_list import router as lobbies_list_router
 
 # db
 from database.models import async_main
@@ -21,7 +23,14 @@ async def main():
     load_dotenv()
     bot = Bot(token=os.getenv("BOT_TOKEN"))
     dp = Dispatcher()
-    for router in [start_router, help_router, create_poll_router, poll_list_router]:
+    for router in [
+        start_router,
+        help_router,
+        create_poll_router,
+        poll_list_router,
+        create_lobby_router,
+        lobbies_list_router,
+    ]:
         dp.include_router(router)
     await dp.start_polling(bot)
 

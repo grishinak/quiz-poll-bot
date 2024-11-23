@@ -30,20 +30,36 @@ class Poll(Base):
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
 
-class Player(Base):
-    __tablename__ = "players"
+class Lobby(Base):
+    __tablename__ = "lobbies"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+
+class LobbyParticipants(Base):
+    __tablename__ = "lobby_participants"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    lobby_id: Mapped[int] = mapped_column(ForeignKey("lobbies.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+
+# class Player(Base):
+#     __tablename__ = "players"
+
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
+#     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
 
 class Answer(Base):
     __tablename__ = "answers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    player_id: Mapped[int] = mapped_column(ForeignKey("players.id"))
+    lobby_id: Mapped[int] = mapped_column(ForeignKey("lobbies.id"))
+    player_id: Mapped[int] = mapped_column(ForeignKey("lobby_participants.id"))
     answer: Mapped[str] = mapped_column(String(250))
 
 
