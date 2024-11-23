@@ -38,7 +38,7 @@ class Lobby(Base):
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
 
-class LobbyParticipants(Base):
+class LobbyParticipant(Base):
     __tablename__ = "lobby_participants"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -59,7 +59,9 @@ class Answer(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     lobby_id: Mapped[int] = mapped_column(ForeignKey("lobbies.id"))
-    player_id: Mapped[int] = mapped_column(ForeignKey("lobby_participants.id"))
+    lobby_participant_id: Mapped[int] = mapped_column(
+        ForeignKey("lobby_participants.id")
+    )
     answer: Mapped[str] = mapped_column(String(250))
 
 

@@ -1,5 +1,5 @@
 from database.models import async_session
-from database.models import User, Poll, Lobby
+from database.models import User, Poll, Lobby, LobbyParticipant
 from sqlalchemy import select
 
 # func for setting user data from /start
@@ -86,3 +86,13 @@ async def get_lobbies(user_id: int):
             )
             # Возвращаем список кортежей, который можно использовать вне сессии
             return result.all()
+
+
+# add lobby_participant data to db from ???
+async def set_lobby_participant(lobby_id: int, user_id: int):
+    async with async_session() as session:
+        lobby_participant = LobbyParticipant(lobby_id=lobby_id, user_id=user_id)
+        session.add(lobby_participant)
+
+        # Фиксируем изменения в базе данных
+        await session.commit()

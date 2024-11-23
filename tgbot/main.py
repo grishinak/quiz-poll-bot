@@ -13,6 +13,7 @@ from handlers.create_poll import router as create_poll_router
 from handlers.poll_list import router as poll_list_router
 from handlers.create_lobby import router as create_lobby_router
 from handlers.lobbies_list import router as lobbies_list_router
+from handlers.connect_lobby import router as connect_lobby_router
 
 # db
 from database.models import async_main
@@ -30,6 +31,7 @@ async def main():
         poll_list_router,
         create_lobby_router,
         lobbies_list_router,
+        connect_lobby_router,
     ]:
         dp.include_router(router)
     await dp.start_polling(bot)

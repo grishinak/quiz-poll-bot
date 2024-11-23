@@ -57,3 +57,6 @@ async def process_name(message: Message, state: FSMContext):
         print(f"Ошибка при создании лобби: {e}")
 
     await state.clear()
+
+
+# TODO: delete lobbies
