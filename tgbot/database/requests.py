@@ -128,3 +128,30 @@ async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
                 select(Poll).where(Poll.id == poll_id, Poll.creator_id == creator_id)
             )
             return result.scalar()
+
+
+# Проверка существования лобби
+async def check_lobby_exists(lobby_id: int):
+    async with async_session() as session:
+        stmt = select(Lobby).filter(Lobby.id == lobby_id)
+        result = await session.execute(stmt)
+        return result.scalars().first() is not None
+
+
+# Проверка, является ли пользователь участником лобби
+async def check_if_participant_exists(lobby_id: int, user_id: int):
+    async with async_session() as session:
+        stmt = select(LobbyParticipant).filter(
+            LobbyParticipant.lobby_id == lobby_id, LobbyParticipant.user_id == user_id
+        )
+        result = await session.execute(stmt)
+        return result.scalars().first() is not None
+
+
+# Добавление участника в лобби
+async def set_lobby_participant(lobby_id: int, user_id: int):
+    async with async_session() as session:
+        participant = LobbyParticipant(lobby_id=lobby_id, user_id=user_id)
+        session.add(participant)
+        await session.commit()
+        return participant
