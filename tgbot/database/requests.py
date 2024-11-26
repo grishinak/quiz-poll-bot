@@ -1,6 +1,6 @@
 from database.models import async_session
 from database.models import User, Poll, Lobby, LobbyParticipant
-from sqlalchemy import select
+from sqlalchemy import select, insert
 
 # func for setting user data from /start
 async def set_user(tg_id, first_name=None, last_name=None):
@@ -60,13 +60,26 @@ async def get_polls(user_id: int):
 
 
 # add lobby data to db from ???
-async def set_lobby(poll_id: int, creator_id: int):
-    async with async_session() as session:
-        lobby = Lobby(poll_id=poll_id, creator_id=creator_id)
-        session.add(lobby)
 
-        # Фиксируем изменения в базе данных
-        await session.commit()
+
+async def set_lobby(poll_id: int, creator_id: int):
+    """
+    Создает лобби с указанным poll_id и возвращает его ID.
+    :param poll_id: ID опроса
+    :param creator_id: ID создателя
+    :return: ID созданного лобби
+    """
+    async with async_session() as session:
+        async with session.begin():
+            # Создаем запись о лобби
+            stmt = (
+                insert(Lobby)
+                .values(poll_id=poll_id, creator_id=creator_id)
+                .returning(Lobby.id)
+            )
+            result = await session.execute(stmt)
+            lobby_id = result.scalar()
+            return lobby_id
 
 
 async def get_lobbies(user_id: int):
@@ -96,3 +109,22 @@ async def set_lobby_participant(lobby_id: int, user_id: int):
 
         # Фиксируем изменения в базе данных
         await session.commit()
+
+
+from sqlalchemy.future import select
+from database.models import Poll
+
+
+async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
+    """
+    Проверяет существование опроса с указанным ID и принадлежность создателю.
+    :param poll_id: ID опроса
+    :param creator_id: ID создателя
+    :return: Объект Poll или None
+    """
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(Poll).where(Poll.id == poll_id, Poll.creator_id == creator_id)
+            )
+            return result.scalar()
