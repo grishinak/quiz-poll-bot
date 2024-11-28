@@ -46,14 +46,6 @@ class LobbyParticipant(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
 
-# class Player(Base):
-#     __tablename__ = "players"
-
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-#     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-
-
 class Answer(Base):
     __tablename__ = "answers"
 
