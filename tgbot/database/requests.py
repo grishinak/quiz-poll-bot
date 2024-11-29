@@ -1,5 +1,5 @@
 from database.models import async_session
-from database.models import User, Poll, Lobby, LobbyParticipant
+from database.models import User, Poll, Lobby, LobbyParticipant, Answer
 from sqlalchemy import select, insert
 
 # func for setting user data from /start
@@ -189,3 +189,22 @@ async def get_poll_id_for_lobby(lobby_id: int):
             return lobby.poll_id
         else:
             return None
+
+
+# Сохранение ответа пользователя
+async def set_answer(lobby_id: int, participant_id: int, user_answer: str):
+    """
+    Сохраняет ответ пользователя в базе данных.
+
+    :param lobby_id: ID лобби, связанного с ответом.
+    :param participant_id: ID участника лобби.
+    :param user_answer: Ответ пользователя.
+    :return: Сохраненная запись ответа.
+    """
+    async with async_session() as session:
+        answer = Answer(
+            lobby_id=lobby_id, lobby_participant_id=participant_id, answer=user_answer
+        )
+        session.add(answer)
+        await session.commit()
+        return answer

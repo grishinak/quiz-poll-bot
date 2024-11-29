@@ -5,7 +5,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 import database.requests as rq
 
-import keyboards.start_stop_lobby as kb
+import keyboards.create_lobby as kb
 
 router = Router()
 
@@ -63,7 +63,9 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
     participants = await rq.get_lobby_participants(lobby_id)
 
     for participant_id in participants:
-        await bot.send_message(participant_id, f"Вопрос: {question}")
+        await bot.send_message(
+            participant_id, f"Вопрос: {question}", reply_markup=kb.give_answer
+        )
 
     await callback.message.edit_text(
         "Опрос начат! Участники получили вопрос.",

@@ -34,3 +34,10 @@ def create_stop_lobby_keyboard(lobby_id: int) -> InlineKeyboardMarkup:
             ]
         ]
     )
+
+
+give_answer = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="Ответить на вопрос", callback_data="give_answer")]
+    ]
+)
