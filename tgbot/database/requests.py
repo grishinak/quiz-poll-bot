@@ -161,7 +161,6 @@ async def get_poll_question(poll_id: int):
     async with async_session() as session:
         result = await session.execute(select(Poll).filter(Poll.id == poll_id))
         poll = result.scalars().first()
-        print(f"Результат для poll_id {poll_id}: {poll}")  # logging info
         if poll:
             return poll.question
         else:
@@ -185,15 +184,8 @@ async def get_poll_id_for_lobby(lobby_id: int):
         result = await session.execute(select(Lobby).filter(Lobby.id == lobby_id))
         lobby = result.scalars().first()  # Извлекаем первый результат или None
 
-        # Логируем результат
-        print(
-            f"Результат для lobby_id {lobby_id}: {lobby}"
-        )  # Можете заменить на логгирование
-
         # Проверяем, существует ли лобби и возвращаем poll_id
         if lobby:
-            return (
-                lobby.poll_id
-            )  # Предполагаем, что у вас есть поле poll_id в модели Lobby
+            return lobby.poll_id
         else:
             return None

@@ -56,7 +56,7 @@ async def process_answer(message: Message, state: FSMContext):
     data = await state.get_data()  # get all data about poll from user
     await message.answer(
         f"Все ли верно?\n\nНазвание опроса: {data['name']}\nВопрос: {data['question']}\nОтвет: {data['answer']}",
-        reply_markup=kb.check_menu,  # butons for check
+        reply_markup=kb.check_menu,  # buttons for check
     )
 
 
@@ -78,7 +78,7 @@ async def process_check_false(callback: CallbackQuery, state: FSMContext):
 async def process_check_true(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Успешно")  # alert
     await callback.message.edit_text("Данные верны.")
-    data = await state.get_data()  # TODO: need to save to db
+    data = await state.get_data()
 
     creator_id = callback.from_user.id
     try:

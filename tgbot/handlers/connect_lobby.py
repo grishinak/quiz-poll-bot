@@ -10,6 +10,7 @@ router = Router()
 # FSM для подключения к лобби
 class LobbyState(StatesGroup):
     waiting_for_lobby_id = State()
+    # TODO: state for collecting answers
 
 
 @router.message(Command("connect_lobby"))
@@ -36,4 +37,7 @@ async def process_lobby_id(message: Message, state: FSMContext):
 
     await rq.set_lobby_participant(lobby_id, message.from_user.id)
     await message.answer(f"Вы успешно подключились к лобби #{lobby_id}!")
+
+    # TODO: go to state to give answer if creater sterted.
+
     await state.clear()

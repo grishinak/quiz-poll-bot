@@ -66,7 +66,7 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
         await bot.send_message(participant_id, f"Вопрос: {question}")
 
     await callback.message.edit_text(
-        "Опрос начат! Участники получили первый вопрос.",
+        "Опрос начат! Участники получили вопрос.",
         reply_markup=kb.create_stop_lobby_keyboard(lobby_id),
     )
 
@@ -77,7 +77,7 @@ async def stop_poll_handler(callback: CallbackQuery, bot: Bot):
 
     lobby_id = int(callback.data.split(":")[1])
     participants = await rq.get_lobby_participants(lobby_id)
-
+    # TODO: logic when its over (deleting?)
     for participant_id in participants:
         await bot.send_message(participant_id, "Опрос завершен. Спасибо за участие!")
 
