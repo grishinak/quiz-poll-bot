@@ -12,6 +12,7 @@ help_text = """Список команд:\
 \n/create_lobby - ...\
 \n/lobbies_list - ...\
 \n/connect_lobby - ...\
+\n/show_answers - ...\
 """
 
 # /help handler
