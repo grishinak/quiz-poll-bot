@@ -216,14 +216,13 @@ from sqlalchemy.sql import text
 async def get_lobby_data(creator_tg_id: int):
     query = text(
         """
-    SELECT lobbies.id, lobbies.poll_id,
-           lobby_participants.id, answers.answer,
-           users.first_name, users.last_name,  polls.name
+    SELECT lobbies.id, lobby_participants.id, answers.answer,
+    users.first_name,users.last_name, polls.name,polls.id
     FROM lobbies
-    JOIN lobby_participants ON lobbies.id = lobby_participants.lobby_id
-    JOIN answers ON lobbies.id = answers.lobby_id
-    JOIN users ON lobby_participants.user_id = users.tg_id
-    JOIN polls ON polls.id = lobbies.poll_id
+    JOIN lobby_participants ON lobby_participants.lobby_id=lobbies.id
+    JOIN answers ON lobby_participants.id=answers.id
+    JOIN users ON users.tg_id=lobby_participants.user_id
+    JOIN polls ON polls.id=lobbies.poll_id
 
     WHERE lobbies.creator_id = :creator_tg_id;
     """
@@ -235,12 +234,12 @@ async def get_lobby_data(creator_tg_id: int):
         return [
             {
                 "lobby_id": row[0],
-                "poll_id": row[1],
-                "participant_id": row[2],
-                "answer": row[3],
-                "first_name": row[4],
-                "last_name": row[5],
-                "polls_name": row[6],
+                "participant_id": row[1],
+                "answer": row[2],
+                "first_name": row[3],
+                "last_name": row[4],
+                "polls_name": row[5],
+                "polls_id": row[6],
             }
             for row in rows
         ]

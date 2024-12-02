@@ -25,7 +25,7 @@ async def show_lobby_users(message: Message):
     for data in lobby_data:
         if data["lobby_id"] != current_lobby_id:
             current_lobby_id = data["lobby_id"]
-            response += f"🔹 Лобби #{current_lobby_id} (Опрос #{data['poll_id']}, Название:'{data['polls_name']})':\n"
+            response += f"🔹 Лобби #{current_lobby_id} (Опрос #{data['polls_id']}, Название:'{data['polls_name']})':\n"
 
         response += f"👤 {data['first_name']} {data['last_name']}: {data['answer']}\n"
     # print(data) #logging info
