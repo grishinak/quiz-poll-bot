@@ -15,6 +15,6 @@ check_menu = InlineKeyboardMarkup(
 
 poll_list = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="Мои опросы", callback_data="poll_list")]
+        [InlineKeyboardButton(text="Мои вопросы", callback_data="poll_list")]
     ]
 )

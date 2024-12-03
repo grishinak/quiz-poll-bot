@@ -52,10 +52,14 @@ end_menu = InlineKeyboardMarkup(
                 text="Получить список ответов", callback_data="show_answers"
             )
         ],
-        [InlineKeyboardButton(text="Создать новый опрос", callback_data="create_poll")],
         [
             InlineKeyboardButton(
-                text="Создать новое лобби",
+                text="Создать новый вопрос", callback_data="create_poll"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="Создать новый опрос",
                 callback_data="create_lobby",
             )
         ],
@@ -72,9 +76,9 @@ participants_end_menu = InlineKeyboardMarkup(
         #     ],
         [
             InlineKeyboardButton(
-                text="Подключиться к новому лобби", callback_data="connect_lobby"
+                text="Подключиться к новому опросу", callback_data="connect_lobby"
             )
         ],
-        [InlineKeyboardButton(text="Создать свой опрос", callback_data="create_poll")],
+        [InlineKeyboardButton(text="Создать свой вопрос", callback_data="create_poll")],
     ]
 )
