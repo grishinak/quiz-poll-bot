@@ -87,15 +87,19 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
 
     participant_id = callback.from_user.id
     try:
-        # Сохраняем ответ в базе данных
-        answer_id = await rq.set_answer(
-            lobby_id=data["lobby_id"],
-            participant_id=participant_id,
-            user_answer=data["answer"],
-        )
+        if await rq.is_lobby_collecting(data["lobby_id"]):
+            answer_id = await rq.set_answer(
+                lobby_id=data["lobby_id"],
+                participant_id=participant_id,
+                user_answer=data["answer"],
+            )
 
-        # Отправляем сообщение пользователю о том, что опрос сохранен
-        await callback.message.answer(f"Ваш ответ '{data['answer']}' сохранен!")
+            # Отправляем сообщение пользователю о том, что опрос сохранен
+            await callback.message.answer(f"Ваш ответ '{data['answer']}' сохранен!")
+        else:
+            await callback.message.answer(
+                f"Время для ответа вышло. Опрос уже завершен."
+            )
 
     except Exception as e:
         # Если произошла ошибка, информируем пользователя

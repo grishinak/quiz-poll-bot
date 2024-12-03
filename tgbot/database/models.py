@@ -36,6 +36,7 @@ class Lobby(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    is_collecting: Mapped[bool] = mapped_column(default=True)  # Новый флаг
 
 
 class LobbyParticipant(Base):

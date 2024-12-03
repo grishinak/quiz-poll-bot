@@ -243,3 +243,24 @@ async def get_lobby_data(creator_tg_id: int):
             }
             for row in rows
         ]
+
+
+async def update_lobby_collecting_status(lobby_id: int, is_collecting: bool):
+    async with async_session() as session:
+        await session.execute(
+            text(
+                "UPDATE lobbies SET is_collecting = :is_collecting WHERE id = :lobby_id"
+            ),
+            {"is_collecting": is_collecting, "lobby_id": lobby_id},
+        )
+        await session.commit()
+
+
+async def is_lobby_collecting(lobby_id: int) -> bool:
+    async with async_session() as session:
+        result = await session.execute(
+            text("SELECT is_collecting FROM lobbies WHERE id = :lobby_id"),
+            {"lobby_id": lobby_id},
+        )
+        row = result.scalar()
+        return bool(row) if row is not None else False

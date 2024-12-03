@@ -58,6 +58,9 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
         await callback.message.edit_text("Лобби не существует.")
         return
 
+    # Установить флаг "сбор ответов" в True
+    await rq.update_lobby_collecting_status(lobby_id, True)
+
     poll_id = await rq.get_poll_id_for_lobby(lobby_id)
     question = await rq.get_poll_question(poll_id)
     participants = await rq.get_lobby_participants(lobby_id)
@@ -76,10 +79,12 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
 @router.callback_query(lambda call: call.data.startswith("stop_poll"))
 async def stop_poll_handler(callback: CallbackQuery, bot: Bot):
     await callback.answer("Сбор ответов закончен.")
-
     lobby_id = int(callback.data.split(":")[1])
+
+    # Установить флаг "сбор ответов" в False
+    await rq.update_lobby_collecting_status(lobby_id, False)
+
     participants = await rq.get_lobby_participants(lobby_id)
-    # TODO: logic when its over (deleting?)
     for participant_id in participants:
         await bot.send_message(participant_id, "Опрос завершен. Спасибо за участие!")
 
