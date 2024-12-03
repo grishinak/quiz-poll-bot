@@ -11,3 +11,14 @@ check_menu = InlineKeyboardMarkup(
         ]
     ]
 )
+
+
+poll_list = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Посмотреть список созданных опросов", callback_data="poll_list"
+            )
+        ]
+    ]
+)

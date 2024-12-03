@@ -8,6 +8,7 @@ from aiogram.fsm.context import FSMContext
 import database.requests as rq
 import keyboards.create_poll as kb
 
+
 router = Router()
 
 # class with fsm states
@@ -92,7 +93,9 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
 
         # Отправляем сообщение пользователю о том, что опрос сохранен
         await callback.message.answer(f"Данные опроса сохранены!")
-        await callback.message.answer(f"Опрос '{data['name']}' успешно создан.")
+        await callback.message.answer(
+            f"Опрос '{data['name']}' успешно создан.", reply_markup=kb.poll_list
+        )
 
     except Exception as e:
         # Если произошла ошибка, информируем пользователя

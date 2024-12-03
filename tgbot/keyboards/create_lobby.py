@@ -41,3 +41,15 @@ give_answer = InlineKeyboardMarkup(
         [InlineKeyboardButton(text="Ответить на вопрос", callback_data="give_answer")]
     ]
 )
+
+end_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="Создать новый опрос", callback_data="create_poll")],
+        [
+            InlineKeyboardButton(
+                text="Создать новое лобби с существующим опросом",
+                callback_data="create_lobby",
+            )
+        ],
+    ]
+)

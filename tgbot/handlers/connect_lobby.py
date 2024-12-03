@@ -16,6 +16,14 @@ class LobbyState(StatesGroup):
     # TODO: state for collecting answers
 
 
+# обработка нажатия кнопки from /start и переход в состояние
+@router.callback_query(F.data == "connect_lobby")
+async def clb_connect_lobby(callback: CallbackQuery, state: FSMContext):
+    await callback.answer("Вы подключаетесь к лобби.")
+    await callback.message.answer("К какому лобби вы хотите подключиться?")
+    await state.set_state(LobbyState.waiting_for_lobby_id)
+
+
 @router.message(Command("connect_lobby"))
 async def cmd_connect_lobby(message: Message, state: FSMContext):
     await message.answer("К какому лобби вы хотите подключиться?")

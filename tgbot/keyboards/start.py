@@ -3,6 +3,11 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 # button to create_poll fsm from /start command
 start_menu = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="Создать опрос", callback_data="create_poll")]
+        [InlineKeyboardButton(text="Создать опрос", callback_data="create_poll")],
+        [
+            InlineKeyboardButton(
+                text="Подключиться к существующему", callback_data="connect_lobby"
+            )
+        ],
     ]
 )

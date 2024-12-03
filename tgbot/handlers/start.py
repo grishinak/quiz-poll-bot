@@ -6,7 +6,7 @@ import keyboards.start as kb
 import database.requests as rq
 
 router = Router()
-start_text = """С помощью этого бота Вы можете создать опрос с правильным ответом.\n"""
+start_text = """С помощью этого бота Вы можете проводить опросы.\n"""
 
 # /start handler
 @router.message(CommandStart())

@@ -1,4 +1,4 @@
-from aiogram import Router, Bot
+from aiogram import Router, Bot, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
@@ -19,6 +19,16 @@ async def process_create_lobby_cmd(message: Message, state: FSMContext):
     await message.answer("Вы начали создание лобби!")
     await state.set_state(CreateLobby.poll)
     await message.answer(
+        "Введите номер опроса (после #), который вы хотите использовать для лобби:"
+    )
+
+
+@router.callback_query(F.data == "create_lobby")
+async def process_create_lobby_clb(callback: CallbackQuery, state: FSMContext):
+    await callback.answer("Вы начали создание лобби!")
+    await callback.message.answer("Вы начали создание лобби!")
+    await state.set_state(CreateLobby.poll)
+    await callback.message.answer(
         "Введите номер опроса (после #), который вы хотите использовать для лобби:"
     )
 
@@ -88,4 +98,4 @@ async def stop_poll_handler(callback: CallbackQuery, bot: Bot):
     for participant_id in participants:
         await bot.send_message(participant_id, "Опрос завершен. Спасибо за участие!")
 
-    await callback.message.edit_text("Опрос завершен!")
+    await callback.message.edit_text("Опрос завершен!", reply_markup=kb.end_menu)
