@@ -6,8 +6,8 @@ router = Router()
 help_text = """Список команд:\
 \n/start - инициализация бота.\
 \n/help - получение информации о боте.\
-\n/create_poll - создание опроса.\
-\n/poll_list - список созданных опросов.\
+\n/create_question - создание опроса.\
+\n/questions_list - список созданных опросов.\
     \
 \n/create_lobby - ...\
 \n/lobbies_list - ...\

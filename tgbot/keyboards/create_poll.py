@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# button for check states in fsm create_poll
+# button for check states in fsm create_question
 check_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
@@ -13,8 +13,8 @@ check_menu = InlineKeyboardMarkup(
 )
 
 
-poll_list = InlineKeyboardMarkup(
+questions_list = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="Мои вопросы", callback_data="poll_list")]
+        [InlineKeyboardButton(text="Мои вопросы", callback_data="questions_list")]
     ]
 )

@@ -8,7 +8,7 @@ import keyboards.poll_list as kb
 router = Router()
 
 
-@router.message(Command("poll_list"))
+@router.message(Command("questions_list"))
 async def show_poll_list_cmd(message: Message):
     user_id = message.from_user.id  # ID пользователя Telegram
 
@@ -29,7 +29,7 @@ async def show_poll_list_cmd(message: Message):
         await message.answer(response)
 
 
-@router.callback_query(F.data == "poll_list")
+@router.callback_query(F.data == "questions_list")
 async def show_poll_list_clb(callback: CallbackQuery):
     callback.answer("Список опросов.")
     user_id = callback.from_user.id  # ID пользователя Telegram

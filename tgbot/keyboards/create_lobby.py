@@ -54,7 +54,7 @@ end_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(
-                text="Создать новый вопрос", callback_data="create_poll"
+                text="Создать новый вопрос", callback_data="create_question"
             )
         ],
         [
@@ -79,6 +79,10 @@ participants_end_menu = InlineKeyboardMarkup(
                 text="Подключиться к новому опросу", callback_data="connect_lobby"
             )
         ],
-        [InlineKeyboardButton(text="Создать свой вопрос", callback_data="create_poll")],
+        [
+            InlineKeyboardButton(
+                text="Создать свой вопрос", callback_data="create_question"
+            )
+        ],
     ]
 )
