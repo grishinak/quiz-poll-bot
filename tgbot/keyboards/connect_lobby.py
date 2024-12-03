@@ -5,7 +5,7 @@ check_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(
-                text="Да, все верно", callback_data="check_answer_true"
+                text="Да, сохранить мой ответ", callback_data="check_answer_true"
             ),
             InlineKeyboardButton(
                 text="Нет, ввести еще раз", callback_data="check_answer_false"

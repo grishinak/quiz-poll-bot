@@ -13,7 +13,6 @@ router = Router()
 class LobbyState(StatesGroup):
     waiting_for_lobby_id = State()
     answer = State()
-    # TODO: state for collecting answers
 
 
 # обработка нажатия кнопки from /start и переход в состояние

@@ -9,12 +9,14 @@ def create_start_stop_lobby_keyboard(lobby_id: int) -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Начать", callback_data=f"start_poll:{lobby_id}"
+                    text="Начать опрос. (Отправить вопрос участникам)",
+                    callback_data=f"start_poll:{lobby_id}",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="Завершить", callback_data=f"stop_poll:{lobby_id}"
+                    text="Завершить опрос. (Прекратить сбор ответов)",
+                    callback_data=f"stop_poll:{lobby_id}",
                 )
             ],
         ]
@@ -29,7 +31,8 @@ def create_stop_lobby_keyboard(lobby_id: int) -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Завершить", callback_data=f"stop_poll:{lobby_id}"
+                    text="Завершить опрос. (Прекратить сбор ответов)",
+                    callback_data=f"stop_poll:{lobby_id}",
                 )
             ]
         ]
@@ -52,7 +55,7 @@ end_menu = InlineKeyboardMarkup(
         [InlineKeyboardButton(text="Создать новый опрос", callback_data="create_poll")],
         [
             InlineKeyboardButton(
-                text="Создать новое лобби с существующим опросом",
+                text="Создать новое лобби",
                 callback_data="create_lobby",
             )
         ],
