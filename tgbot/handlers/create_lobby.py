@@ -96,6 +96,10 @@ async def stop_poll_handler(callback: CallbackQuery, bot: Bot):
 
     participants = await rq.get_lobby_participants(lobby_id)
     for participant_id in participants:
-        await bot.send_message(participant_id, "Опрос завершен. Спасибо за участие!")
+        await bot.send_message(
+            participant_id,
+            "Опрос завершен. Спасибо за участие!",
+            reply_markup=kb.participants_end_menu,
+        )
 
     await callback.message.edit_text("Опрос завершен!", reply_markup=kb.end_menu)

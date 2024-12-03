@@ -58,3 +58,20 @@ end_menu = InlineKeyboardMarkup(
         ],
     ]
 )
+
+participants_end_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        # TODO: we may send participants results?
+        #     [
+        #         InlineKeyboardButton(
+        #             text="Получить список ответов", callback_data="show_answers"
+        #         )
+        #     ],
+        [
+            InlineKeyboardButton(
+                text="Подключиться к новому лобби", callback_data="connect_lobby"
+            )
+        ],
+        [InlineKeyboardButton(text="Создать свой опрос", callback_data="create_poll")],
+    ]
+)
