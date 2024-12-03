@@ -44,6 +44,11 @@ give_answer = InlineKeyboardMarkup(
 
 end_menu = InlineKeyboardMarkup(
     inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Получить список ответов", callback_data="show_answers"
+            )
+        ],
         [InlineKeyboardButton(text="Создать новый опрос", callback_data="create_poll")],
         [
             InlineKeyboardButton(
