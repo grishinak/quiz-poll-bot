@@ -9,9 +9,9 @@ help_text = """Список команд:\
 \n/create_question - создание опроса.\
 \n/questions_list - список созданных опросов.\
     \
-\n/create_lobby - ...\
-\n/lobbies_list - ...\
-\n/connect_lobby - ...\
+\n/create_poll - ...\
+\n/polls_list - ...\
+\n/connect_poll - ...\
 \n/show_answers - ...\
 """
 

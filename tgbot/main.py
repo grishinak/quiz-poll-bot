@@ -11,9 +11,9 @@ from handlers.start import router as start_router
 from handlers.help import router as help_router
 from handlers.create_question import router as create_poll_router
 from handlers.questions_list import router as poll_list_router
-from handlers.create_lobby import router as create_lobby_router
-from handlers.lobbies_list import router as lobbies_list_router
-from handlers.connect_lobby import router as connect_lobby_router
+from handlers.create_poll import router as create_lobby_router
+from handlers.polls_list import router as lobbies_list_router
+from handlers.connect_poll import router as connect_lobby_router
 from handlers.show_answers import router as show_answers_router
 
 # db

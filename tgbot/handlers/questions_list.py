@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 
 import database.requests as rq
-import keyboards.poll_list as kb
+import keyboards.questions_list as kb
 
 router = Router()
 
@@ -12,8 +12,8 @@ router = Router()
 async def show_poll_list_cmd(message: Message):
     user_id = message.from_user.id  # ID пользователя Telegram
 
-    # Получаем список опросов из базы данных
-    questions = await rq.get_polls(user_id)
+    # Получаем список  Вопросов из базы данных
+    questions = await rq.get_questions(user_id)
 
     # Если у пользователя нет созданных опросов
     if not questions:
@@ -35,7 +35,7 @@ async def show_poll_list_clb(callback: CallbackQuery):
     user_id = callback.from_user.id  # ID пользователя Telegram
 
     # Получаем список опросов из базы данных
-    questions = await rq.get_polls(user_id)
+    questions = await rq.get_questions(user_id)
 
     # Если у пользователя нет созданных опросов
     if not questions:
@@ -50,4 +50,4 @@ async def show_poll_list_clb(callback: CallbackQuery):
             )
 
         # Отправляем пользователю список опросов
-        await callback.message.answer(response, reply_markup=kb.create_lobby)
+        await callback.message.answer(response, reply_markup=kb.create_poll)

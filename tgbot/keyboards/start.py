@@ -6,7 +6,7 @@ start_menu = InlineKeyboardMarkup(
         [InlineKeyboardButton(text="Создать вопрос", callback_data="create_question")],
         [
             InlineKeyboardButton(
-                text="Подключиться к опросу", callback_data="connect_lobby"
+                text="Подключиться к опросу", callback_data="connect_poll"
             )
         ],
     ]

@@ -39,7 +39,7 @@ async def set_poll(name: str, question: str, answer: str, creator_id: int):
         await session.commit()
 
 
-async def get_polls(user_id: int):
+async def get_questions(user_id: int):
     """
     Получает список опросов, созданных пользователем.
 
@@ -84,7 +84,7 @@ async def set_lobby(poll_id: int, creator_id: int):
             return lobby_id
 
 
-async def get_lobbies(user_id: int):
+async def get_polls(user_id: int):
     """
     Получает список лобби, созданных пользователем.
 
@@ -104,7 +104,7 @@ async def get_lobbies(user_id: int):
 
 
 # add lobby_participant data to db from ???
-async def set_lobby_participant(lobby_id: int, user_id: int):
+async def set_poll_participant(lobby_id: int, user_id: int):
     async with async_session() as session:
         lobby_participant = PollParticipant(lobby_id=lobby_id, user_id=user_id)
         session.add(lobby_participant)
@@ -135,7 +135,7 @@ async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
 
 
 # Проверка существования лобби
-async def check_lobby_exists(lobby_id: int):
+async def check_poll_exists(lobby_id: int):
     async with async_session() as session:
         stmt = select(Poll).filter(Poll.id == lobby_id)
         result = await session.execute(stmt)
@@ -153,7 +153,7 @@ async def check_if_participant_exists(lobby_id: int, user_id: int):
 
 
 # Добавление участника в лобби
-async def set_lobby_participant(lobby_id: int, user_id: int):
+async def set_poll_participant(lobby_id: int, user_id: int):
     async with async_session() as session:
         participant = PollParticipant(lobby_id=lobby_id, user_id=user_id)
         session.add(participant)
@@ -172,7 +172,7 @@ async def get_poll_question(poll_id: int):
 
 
 # Получение участников лобби
-async def get_lobby_participants(lobby_id: int):
+async def get_poll_participants(lobby_id: int):
     async with async_session() as session:
         result = await session.execute(
             select(PollParticipant.user_id).filter(PollParticipant.lobby_id == lobby_id)
@@ -248,7 +248,7 @@ async def get_lobby_data(creator_tg_id: int):
         ]
 
 
-async def update_lobby_collecting_status(lobby_id: int, is_collecting: bool):
+async def update_poll_collecting_status(lobby_id: int, is_collecting: bool):
     async with async_session() as session:
         await session.execute(
             text(
@@ -259,7 +259,7 @@ async def update_lobby_collecting_status(lobby_id: int, is_collecting: bool):
         await session.commit()
 
 
-async def is_lobby_collecting(lobby_id: int) -> bool:
+async def is_poll_collecting(lobby_id: int) -> bool:
     async with async_session() as session:
         result = await session.execute(
             text("SELECT is_collecting FROM polls WHERE id = :lobby_id"),

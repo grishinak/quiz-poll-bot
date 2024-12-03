@@ -7,12 +7,12 @@ import database.requests as rq
 router = Router()
 
 
-@router.message(Command("lobbies_list"))
-async def show_lobbies_list(message: Message):
+@router.message(Command("polls_list"))
+async def show_polls_list(message: Message):
     user_id = message.from_user.id  # ID пользователя Telegram
 
     # Получаем список опросов из базы данных
-    polls = await rq.get_lobbies(user_id)
+    polls = await rq.get_polls(user_id)
 
     # Если у пользователя нет созданных опросов
     if not polls:

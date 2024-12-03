@@ -5,7 +5,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 import database.requests as rq
 
-import keyboards.create_lobby as kb
+import keyboards.create_poll as kb
 
 router = Router()
 
@@ -14,7 +14,7 @@ class CreateLobby(StatesGroup):
     polls = State()
 
 
-@router.message(Command("create_lobby"))
+@router.message(Command("create_poll"))
 async def process_create_lobby_cmd(message: Message, state: FSMContext):
     await message.answer("Вы начали создание опроса!")
     await state.set_state(CreateLobby.polls)
@@ -23,7 +23,7 @@ async def process_create_lobby_cmd(message: Message, state: FSMContext):
     )
 
 
-@router.callback_query(F.data == "create_lobby")
+@router.callback_query(F.data == "create_poll")
 async def process_create_lobby_clb(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Вы начали создание опроса!")
     await callback.message.answer("Вы начали создание опроса!")
@@ -50,7 +50,7 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
 
         await message.answer(
             f"Опрос #{lobby_id} успешно создан! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",
-            reply_markup=kb.create_start_stop_lobby_keyboard(lobby_id),
+            reply_markup=kb.create_start_stop_poll_keyboard(lobby_id),
         )
     except Exception as e:
         await message.answer("Произошла ошибка при создании опроса. Попробуйте снова.")
@@ -64,16 +64,16 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
     await callback.answer("Сбор ответов начат.")
     lobby_id = int(callback.data.split(":")[1])
 
-    if not await rq.check_lobby_exists(lobby_id):
+    if not await rq.check_poll_exists(lobby_id):
         await callback.message.edit_text("Опроса не существует.")
         return
 
     # Установить флаг "сбор ответов" в True
-    await rq.update_lobby_collecting_status(lobby_id, True)
+    await rq.update_poll_collecting_status(lobby_id, True)
 
     poll_id = await rq.get_poll_id_for_lobby(lobby_id)
     question = await rq.get_poll_question(poll_id)
-    participants = await rq.get_lobby_participants(lobby_id)
+    participants = await rq.get_poll_participants(lobby_id)
 
     for participant_id in participants:
         await bot.send_message(
@@ -82,7 +82,7 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
 
     await callback.message.edit_text(
         "Опрос начат! Участники получили вопрос.",
-        reply_markup=kb.create_stop_lobby_keyboard(lobby_id),
+        reply_markup=kb.create_stop_poll_keyboard(lobby_id),
     )
 
 
@@ -92,9 +92,9 @@ async def stop_poll_handler(callback: CallbackQuery, bot: Bot):
     lobby_id = int(callback.data.split(":")[1])
 
     # Установить флаг "сбор ответов" в False
-    await rq.update_lobby_collecting_status(lobby_id, False)
+    await rq.update_poll_collecting_status(lobby_id, False)
 
-    participants = await rq.get_lobby_participants(lobby_id)
+    participants = await rq.get_poll_participants(lobby_id)
     for participant_id in participants:
         await bot.send_message(
             participant_id,

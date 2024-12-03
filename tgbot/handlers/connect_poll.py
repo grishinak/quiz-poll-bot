@@ -5,39 +5,39 @@ from aiogram.filters import Command
 from aiogram.fsm.state import StatesGroup, State
 import database.requests as rq
 
-import keyboards.connect_lobby as kb
+import keyboards.connect_poll as kb
 
 router = Router()
 
 # FSM для подключения к лобби
-class LobbyState(StatesGroup):
-    waiting_for_lobby_id = State()
+class PollState(StatesGroup):
+    waiting_for_poll_id = State()
     answer = State()
 
 
 # обработка нажатия кнопки from /start и переход в состояние
-@router.callback_query(F.data == "connect_lobby")
-async def clb_connect_lobby(callback: CallbackQuery, state: FSMContext):
+@router.callback_query(F.data == "connect_poll")
+async def clb_connect_poll(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Вы подключаетесь к опросу.")
     await callback.message.answer("К какому опросу вы хотите подключиться?")
-    await state.set_state(LobbyState.waiting_for_lobby_id)
+    await state.set_state(PollState.waiting_for_poll_id)
 
 
-@router.message(Command("connect_lobby"))
-async def cmd_connect_lobby(message: Message, state: FSMContext):
+@router.message(Command("connect_poll"))
+async def cmd_connect_poll(message: Message, state: FSMContext):
     await message.answer("К какому опросу вы хотите подключиться?")
-    await state.set_state(LobbyState.waiting_for_lobby_id)
+    await state.set_state(PollState.waiting_for_poll_id)
 
 
-@router.message(LobbyState.waiting_for_lobby_id)
-async def process_lobby_id(message: Message, state: FSMContext):
+@router.message(PollState.waiting_for_poll_id)
+async def process_poll_id(message: Message, state: FSMContext):
     try:
         lobby_id = int(message.text)
     except ValueError:
         await message.answer("Пожалуйста, введите действительный ID опроса.")
         return
 
-    if not await rq.check_lobby_exists(lobby_id):
+    if not await rq.check_poll_exists(lobby_id):
         await message.answer("Опроса не существует.")
         return
 
@@ -45,7 +45,7 @@ async def process_lobby_id(message: Message, state: FSMContext):
         await message.answer("Вы уже подключены к этому опросу!")
         return
 
-    await rq.set_lobby_participant(lobby_id, message.from_user.id)
+    await rq.set_poll_participant(lobby_id, message.from_user.id)
     await state.update_data(lobby_id=message.text)
     await message.answer(f"Вы успешно подключились к опросу #{lobby_id}!")
 
@@ -60,11 +60,11 @@ async def process_lobby_id(message: Message, state: FSMContext):
 async def give_answer_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Вы начали отвечать на вопрос")  # alert
 
-    await state.set_state(LobbyState.answer)  # goes to state
+    await state.set_state(PollState.answer)  # goes to state
     await callback.message.answer("Введите ваш ответ: ")  # message in chat
 
 
-@router.message(LobbyState.answer)
+@router.message(PollState.answer)
 async def process_answer(message: Message, state: FSMContext):
     await state.update_data(answer=message.text)
     data = await state.get_data()  # get all data about polls from user
@@ -81,7 +81,7 @@ async def process_check_false(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Сначала")  # alert
     await callback.message.answer("Вы начали ввод ответа сначала!")  # message in chat
 
-    await state.set_state(LobbyState.answer)  # goes to state
+    await state.set_state(PollState.answer)  # goes to state
     await callback.message.answer("Введите ваш ответ: ")
 
 
@@ -94,7 +94,7 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
 
     participant_id = callback.from_user.id
     try:
-        if await rq.is_lobby_collecting(data["lobby_id"]):
+        if await rq.is_poll_collecting(data["lobby_id"]):
             answer_id = await rq.set_answer(
                 lobby_id=data["lobby_id"],
                 participant_id=participant_id,

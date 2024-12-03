@@ -6,7 +6,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 import database.requests as rq
-import keyboards.create_poll as kb
+import keyboards.create_question as kb
 
 
 router = Router()
