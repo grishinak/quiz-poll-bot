@@ -49,7 +49,7 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
         lobby_id = await rq.set_lobby(poll_id=int(poll_id), creator_id=user_id)
 
         await message.answer(
-            f"Лобби #{lobby_id} успешно создано! Поделитесь этим номером с участниками.",
+            f"Лобби #{lobby_id} успешно создано! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",
             reply_markup=kb.create_start_stop_lobby_keyboard(lobby_id),
         )
     except Exception as e:
