@@ -45,7 +45,9 @@ async def show_poll_list_clb(callback: CallbackQuery):
         # Формируем сообщение со списком опросов
         response = "Ваши созданные опросы:\n\n"
         for poll_id, poll_name, poll_question, poll_answer in polls:
-            response += f"📝 Опрос #{poll_id}: {poll_name}\n\tВопрос: {poll_question}\n\tОтвет: {poll_answer}\n\n"
+            response += (
+                f"📝 Вопрос #{poll_id}: {poll_question}\n\tОтвет: {poll_answer}\n\n"
+            )
 
         # Отправляем пользователю список опросов
         await callback.message.answer(response, reply_markup=kb.create_lobby)

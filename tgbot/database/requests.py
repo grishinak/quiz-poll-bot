@@ -217,7 +217,7 @@ async def get_lobby_data(creator_tg_id: int):
     query = text(
         """
     SELECT lobbies.id, lobby_participants.id, answers.answer,
-    users.first_name,users.last_name, polls.name,polls.id
+    users.first_name,users.last_name, polls.name,polls.id, polls.question
     FROM lobbies
     JOIN lobby_participants ON lobby_participants.lobby_id=lobbies.id
     JOIN answers ON lobby_participants.id=answers.id
@@ -240,6 +240,7 @@ async def get_lobby_data(creator_tg_id: int):
                 "last_name": row[4],
                 "polls_name": row[5],
                 "polls_id": row[6],
+                "question": row[7],
             }
             for row in rows
         ]
