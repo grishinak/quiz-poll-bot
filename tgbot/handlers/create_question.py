@@ -21,8 +21,8 @@ class CreateQuestion(StatesGroup):
 # Обработка нажатия кнопки (from start) и переход в состояние
 @router.callback_query(F.data == "create_question")
 async def process_create_poll_clb(callback: CallbackQuery, state: FSMContext):
-    await callback.answer("Вы начали создание опроса")  # alert
-    await callback.message.answer("Вы начали создание опроса!")  # message in chat
+    await callback.answer("Вы начали создание вопроса")  # alert
+    await callback.message.answer("Вы начали создание вопроса!")  # message in chat
 
     # await state.set_state(CreateQuestion.name)  # goes to state
     # await callback.message.answer("Введите название опроса:")

@@ -15,15 +15,17 @@ async def show_poll_list_cmd(message: Message):
     # Получаем список  Вопросов из базы данных
     questions = await rq.get_questions(user_id)
 
-    # Если у пользователя нет созданных опросов
+    # Если у пользователя нет созданных вопросов
     if not questions:
-        await message.answer("У вас нет созданных опросов.")
+        await message.answer("У вас нет созданных вопросов.")
 
     else:
         # Формируем сообщение со списком опросов
-        response = "Ваши созданные опросы:\n\n"
+        response = "Ваши созданные вопросы:\n\n"
         for poll_id, poll_name, poll_question, poll_answer in questions:
-            response += f"📝 Опрос #{poll_id}: {poll_name}\n\tВопрос: {poll_question}\n\tОтвет: {poll_answer}\n\n"
+            response += (
+                f"📝 Вопрос #{poll_id}: {poll_question}\n\tОтвет: {poll_answer}\n\n"
+            )
 
         # Отправляем пользователю список опросов
         await message.answer(response)
@@ -31,7 +33,7 @@ async def show_poll_list_cmd(message: Message):
 
 @router.callback_query(F.data == "questions_list")
 async def show_poll_list_clb(callback: CallbackQuery):
-    callback.answer("Список опросов.")
+    callback.answer("Список вопросов.")
     user_id = callback.from_user.id  # ID пользователя Telegram
 
     # Получаем список опросов из базы данных
@@ -39,7 +41,7 @@ async def show_poll_list_clb(callback: CallbackQuery):
 
     # Если у пользователя нет созданных опросов
     if not questions:
-        await callback.message.answer("У вас нет созданных опросов.")
+        await callback.message.answer("У вас нет созданных вопросов.")
 
     else:
         # Формируем сообщение со списком опросов

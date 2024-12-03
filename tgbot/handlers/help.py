@@ -3,16 +3,15 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 router = Router()
-help_text = """Список команд:\
-\n/start - инициализация бота.\
-\n/help - получение информации о боте.\
-\n/create_question - создание опроса.\
-\n/questions_list - список созданных опросов.\
-    \
-\n/create_poll - ...\
-\n/polls_list - ...\
-\n/connect_poll - ...\
-\n/show_answers - ...\
+help_text = """Список команд:\n\
+\n/start - Инициализация бота.\
+\n/help - Получение информации о командах бота.\
+\n/create_question - Создание вопроса.\
+\n/questions_list - Список созданных опросов.\
+\n/create_poll - Создать опрос с вопросом. \
+\n/polls_list - Список опросов. \
+\n/connect_poll - Подключиться к созданному опросу. \
+\n/show_answers - Список ответов из опросов. \
 """
 
 # /help handler

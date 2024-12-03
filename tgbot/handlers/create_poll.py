@@ -10,14 +10,14 @@ import keyboards.create_poll as kb
 router = Router()
 
 # Класс FSM для создания лобби
-class CreateLobby(StatesGroup):
+class CreatePoll(StatesGroup):
     polls = State()
 
 
 @router.message(Command("create_poll"))
 async def process_create_lobby_cmd(message: Message, state: FSMContext):
     await message.answer("Вы начали создание опроса!")
-    await state.set_state(CreateLobby.polls)
+    await state.set_state(CreatePoll.polls)
     await message.answer(
         "Введите номер вопроса (после #), который вы хотите использовать для опроса:"
     )
@@ -27,13 +27,13 @@ async def process_create_lobby_cmd(message: Message, state: FSMContext):
 async def process_create_lobby_clb(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Вы начали создание опроса!")
     await callback.message.answer("Вы начали создание опроса!")
-    await state.set_state(CreateLobby.polls)
+    await state.set_state(CreatePoll.polls)
     await callback.message.answer(
         "Введите номер вопроса (после #), который вы хотите использовать для опроса:"
     )
 
 
-@router.message(CreateLobby.polls)
+@router.message(CreatePoll.polls)
 async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
     poll_id = message.text.strip()
     user_id = message.from_user.id
@@ -46,7 +46,7 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
             )
             return
 
-        lobby_id = await rq.set_lobby(poll_id=int(poll_id), creator_id=user_id)
+        lobby_id = await rq.set_poll(poll_id=int(poll_id), creator_id=user_id)
 
         await message.answer(
             f"Опрос #{lobby_id} успешно создан! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",

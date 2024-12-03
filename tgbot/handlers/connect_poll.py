@@ -9,7 +9,7 @@ import keyboards.connect_poll as kb
 
 router = Router()
 
-# FSM для подключения к лобби
+# FSM для подключения к опросу
 class PollState(StatesGroup):
     waiting_for_poll_id = State()
     answer = State()
@@ -49,13 +49,10 @@ async def process_poll_id(message: Message, state: FSMContext):
     await state.update_data(lobby_id=message.text)
     await message.answer(f"Вы успешно подключились к опросу #{lobby_id}!")
 
-    # TODO: go to state to give answer if creater sterted.
-
     # await state.clear()
 
-    # Обработка нажатия кнопки (from start) и переход в состояние
 
-
+# Обработка нажатия кнопки (from start) и переход в состояние
 @router.callback_query(F.data == "give_answer")
 async def give_answer_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Вы начали отвечать на вопрос")  # alert

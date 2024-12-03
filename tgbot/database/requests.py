@@ -64,12 +64,12 @@ async def get_questions(user_id: int):
 # add lobby data to db from ???
 
 
-async def set_lobby(poll_id: int, creator_id: int):
+async def set_poll(poll_id: int, creator_id: int):
     """
-    Создает лобби с указанным poll_id и возвращает его ID.
+    Создает опрос с указанным poll_id и возвращает его ID.
     :param poll_id: ID опроса
     :param creator_id: ID создателя
-    :return: ID созданного лобби
+    :return: ID созданного опроса
     """
     async with async_session() as session:
         async with session.begin():
@@ -215,7 +215,7 @@ async def set_answer(lobby_id: int, participant_id: int, user_answer: str):
 from sqlalchemy.sql import text
 
 
-async def get_lobby_data(creator_tg_id: int):
+async def get_poll_data(creator_tg_id: int):
     query = text(
         """
     SELECT polls.id, poll_participants.id, answers.answer,
