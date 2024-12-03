@@ -67,7 +67,7 @@ async def give_answer_handler(callback: CallbackQuery, state: FSMContext):
 @router.message(LobbyState.answer)
 async def process_answer(message: Message, state: FSMContext):
     await state.update_data(answer=message.text)
-    data = await state.get_data()  # get all data about poll from user
+    data = await state.get_data()  # get all data about polls from user
     await message.answer(
         f"Все ли верно?\n\nОтвет: {data['answer']}",
         reply_markup=kb.check_menu,  # buttons for check

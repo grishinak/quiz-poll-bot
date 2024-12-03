@@ -20,30 +20,30 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(50), nullable=True)
 
 
-class Poll(Base):
-    __tablename__ = "polls"
+class Question(Base):
+    __tablename__ = "questions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(50), default=None, nullable=True)
+    name: Mapped[str] = mapped_column(String(50), default=None, nullable=True)  ###
     question: Mapped[str] = mapped_column(String(250))
     answer: Mapped[str] = mapped_column(String(250))
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
 
-class Lobby(Base):
-    __tablename__ = "lobbies"
+class Poll(Base):
+    __tablename__ = "polls"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
+    poll_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     is_collecting: Mapped[bool] = mapped_column(default=True)  # Новый флаг
 
 
-class LobbyParticipant(Base):
-    __tablename__ = "lobby_participants"
+class PollParticipant(Base):
+    __tablename__ = "poll_participants"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    lobby_id: Mapped[int] = mapped_column(ForeignKey("lobbies.id"))
+    lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
 
@@ -51,9 +51,9 @@ class Answer(Base):
     __tablename__ = "answers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    lobby_id: Mapped[int] = mapped_column(ForeignKey("lobbies.id"))
+    lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
     lobby_participant_id: Mapped[int] = mapped_column(
-        ForeignKey("lobby_participants.id")
+        ForeignKey("poll_participants.id")
     )
     answer: Mapped[str] = mapped_column(String(250))
 

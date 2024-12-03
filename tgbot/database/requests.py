@@ -1,5 +1,5 @@
 from database.models import async_session
-from database.models import User, Poll, Lobby, LobbyParticipant, Answer
+from database.models import User, Question, Poll, PollParticipant, Answer
 from sqlalchemy import select, insert
 
 # func for setting user data from /start
@@ -27,11 +27,13 @@ async def set_user(tg_id, first_name=None, last_name=None):
         await session.commit()
 
 
-# add poll data to db from check_true in create_poll fsm
+# add polls data to db from check_true in create_poll fsm
 async def set_poll(name: str, question: str, answer: str, creator_id: int):
     async with async_session() as session:
-        poll = Poll(name=name, question=question, answer=answer, creator_id=creator_id)
-        session.add(poll)
+        polls = Question(
+            name=name, question=question, answer=answer, creator_id=creator_id
+        )
+        session.add(polls)
 
         # Фиксируем изменения в базе данных
         await session.commit()
@@ -48,15 +50,15 @@ async def get_polls(user_id: int):
         async with session.begin():
             # Выбираем только необходимые данные, чтобы избежать привязки к сессии
             result = await session.execute(
-                select(Poll.id, Poll.name, Poll.question, Poll.answer).where(
-                    Poll.creator_id == user_id
-                )
+                select(
+                    Question.id, Question.name, Question.question, Question.answer
+                ).where(Question.creator_id == user_id)
             )
             # Возвращаем список кортежей, который можно использовать вне сессии
             return result.all()
 
 
-# TODO: delete users polls from db from user menu
+# TODO: delete users questions from db from user menu
 
 
 # add lobby data to db from ???
@@ -73,9 +75,9 @@ async def set_lobby(poll_id: int, creator_id: int):
         async with session.begin():
             # Создаем запись о лобби
             stmt = (
-                insert(Lobby)
+                insert(Poll)
                 .values(poll_id=poll_id, creator_id=creator_id)
-                .returning(Lobby.id)
+                .returning(Poll.id)
             )
             result = await session.execute(stmt)
             lobby_id = result.scalar()
@@ -93,8 +95,8 @@ async def get_lobbies(user_id: int):
         async with session.begin():
             # Выбираем только необходимые данные, чтобы избежать привязки к сессии
             result = await session.execute(
-                select(Lobby.id, Lobby.poll_id, Lobby.creator_id).where(
-                    Lobby.creator_id == user_id
+                select(Poll.id, Poll.poll_id, Poll.creator_id).where(
+                    Poll.creator_id == user_id
                 )
             )
             # Возвращаем список кортежей, который можно использовать вне сессии
@@ -104,7 +106,7 @@ async def get_lobbies(user_id: int):
 # add lobby_participant data to db from ???
 async def set_lobby_participant(lobby_id: int, user_id: int):
     async with async_session() as session:
-        lobby_participant = LobbyParticipant(lobby_id=lobby_id, user_id=user_id)
+        lobby_participant = PollParticipant(lobby_id=lobby_id, user_id=user_id)
         session.add(lobby_participant)
 
         # Фиксируем изменения в базе данных
@@ -112,7 +114,7 @@ async def set_lobby_participant(lobby_id: int, user_id: int):
 
 
 from sqlalchemy.future import select
-from database.models import Poll
+from database.models import Question
 
 
 async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
@@ -120,12 +122,14 @@ async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
     Проверяет существование опроса с указанным ID и принадлежность создателю.
     :param poll_id: ID опроса
     :param creator_id: ID создателя
-    :return: Объект Poll или None
+    :return: Объект Question или None
     """
     async with async_session() as session:
         async with session.begin():
             result = await session.execute(
-                select(Poll).where(Poll.id == poll_id, Poll.creator_id == creator_id)
+                select(Question).where(
+                    Question.id == poll_id, Question.creator_id == creator_id
+                )
             )
             return result.scalar()
 
@@ -133,7 +137,7 @@ async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
 # Проверка существования лобби
 async def check_lobby_exists(lobby_id: int):
     async with async_session() as session:
-        stmt = select(Lobby).filter(Lobby.id == lobby_id)
+        stmt = select(Poll).filter(Poll.id == lobby_id)
         result = await session.execute(stmt)
         return result.scalars().first() is not None
 
@@ -141,8 +145,8 @@ async def check_lobby_exists(lobby_id: int):
 # Проверка, является ли пользователь участником лобби
 async def check_if_participant_exists(lobby_id: int, user_id: int):
     async with async_session() as session:
-        stmt = select(LobbyParticipant).filter(
-            LobbyParticipant.lobby_id == lobby_id, LobbyParticipant.user_id == user_id
+        stmt = select(PollParticipant).filter(
+            PollParticipant.lobby_id == lobby_id, PollParticipant.user_id == user_id
         )
         result = await session.execute(stmt)
         return result.scalars().first() is not None
@@ -151,7 +155,7 @@ async def check_if_participant_exists(lobby_id: int, user_id: int):
 # Добавление участника в лобби
 async def set_lobby_participant(lobby_id: int, user_id: int):
     async with async_session() as session:
-        participant = LobbyParticipant(lobby_id=lobby_id, user_id=user_id)
+        participant = PollParticipant(lobby_id=lobby_id, user_id=user_id)
         session.add(participant)
         await session.commit()
         return participant
@@ -159,10 +163,10 @@ async def set_lobby_participant(lobby_id: int, user_id: int):
 
 async def get_poll_question(poll_id: int):
     async with async_session() as session:
-        result = await session.execute(select(Poll).filter(Poll.id == poll_id))
-        poll = result.scalars().first()
-        if poll:
-            return poll.question
+        result = await session.execute(select(Question).filter(Question.id == poll_id))
+        polls = result.scalars().first()
+        if polls:
+            return polls.question
         else:
             return None
 
@@ -171,9 +175,7 @@ async def get_poll_question(poll_id: int):
 async def get_lobby_participants(lobby_id: int):
     async with async_session() as session:
         result = await session.execute(
-            select(LobbyParticipant.user_id).filter(
-                LobbyParticipant.lobby_id == lobby_id
-            )
+            select(PollParticipant.user_id).filter(PollParticipant.lobby_id == lobby_id)
         )
         return [row.user_id for row in result.all()]
 
@@ -181,7 +183,7 @@ async def get_lobby_participants(lobby_id: int):
 async def get_poll_id_for_lobby(lobby_id: int):
     async with async_session() as session:
         # Выполняем запрос для получения poll_id, связанного с lobby_id
-        result = await session.execute(select(Lobby).filter(Lobby.id == lobby_id))
+        result = await session.execute(select(Poll).filter(Poll.id == lobby_id))
         lobby = result.scalars().first()  # Извлекаем первый результат или None
 
         # Проверяем, существует ли лобби и возвращаем poll_id
@@ -216,15 +218,15 @@ from sqlalchemy.sql import text
 async def get_lobby_data(creator_tg_id: int):
     query = text(
         """
-    SELECT lobbies.id, lobby_participants.id, answers.answer,
-    users.first_name,users.last_name, polls.name,polls.id, polls.question
-    FROM lobbies
-    JOIN lobby_participants ON lobby_participants.lobby_id=lobbies.id
-    JOIN answers ON lobby_participants.id=answers.id
-    JOIN users ON users.tg_id=lobby_participants.user_id
-    JOIN polls ON polls.id=lobbies.poll_id
+    SELECT polls.id, poll_participants.id, answers.answer,
+    users.first_name,users.last_name, questions.name,questions.id, questions.question
+    FROM polls
+    JOIN poll_participants ON poll_participants.lobby_id=polls.id
+    JOIN answers ON poll_participants.id=answers.id
+    JOIN users ON users.tg_id=poll_participants.user_id
+    JOIN questions ON questions.id=polls.poll_id
 
-    WHERE lobbies.creator_id = :creator_tg_id;
+    WHERE polls.creator_id = :creator_tg_id;
     """
     )
 
@@ -250,7 +252,7 @@ async def update_lobby_collecting_status(lobby_id: int, is_collecting: bool):
     async with async_session() as session:
         await session.execute(
             text(
-                "UPDATE lobbies SET is_collecting = :is_collecting WHERE id = :lobby_id"
+                "UPDATE polls SET is_collecting = :is_collecting WHERE id = :lobby_id"
             ),
             {"is_collecting": is_collecting, "lobby_id": lobby_id},
         )
@@ -260,7 +262,7 @@ async def update_lobby_collecting_status(lobby_id: int, is_collecting: bool):
 async def is_lobby_collecting(lobby_id: int) -> bool:
     async with async_session() as session:
         result = await session.execute(
-            text("SELECT is_collecting FROM lobbies WHERE id = :lobby_id"),
+            text("SELECT is_collecting FROM polls WHERE id = :lobby_id"),
             {"lobby_id": lobby_id},
         )
         row = result.scalar()

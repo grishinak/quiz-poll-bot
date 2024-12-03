@@ -11,13 +11,13 @@ router = Router()
 
 # Класс FSM для создания лобби
 class CreateLobby(StatesGroup):
-    poll = State()
+    polls = State()
 
 
 @router.message(Command("create_lobby"))
 async def process_create_lobby_cmd(message: Message, state: FSMContext):
     await message.answer("Вы начали создание опроса!")
-    await state.set_state(CreateLobby.poll)
+    await state.set_state(CreateLobby.polls)
     await message.answer(
         "Введите номер вопроса (после #), который вы хотите использовать для опроса:"
     )
@@ -27,20 +27,20 @@ async def process_create_lobby_cmd(message: Message, state: FSMContext):
 async def process_create_lobby_clb(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Вы начали создание опроса!")
     await callback.message.answer("Вы начали создание опроса!")
-    await state.set_state(CreateLobby.poll)
+    await state.set_state(CreateLobby.polls)
     await callback.message.answer(
         "Введите номер вопроса (после #), который вы хотите использовать для опроса:"
     )
 
 
-@router.message(CreateLobby.poll)
+@router.message(CreateLobby.polls)
 async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
     poll_id = message.text.strip()
     user_id = message.from_user.id
 
     try:
-        poll = await rq.get_poll_by_id_and_creator(poll_id, user_id)
-        if not poll:
+        polls = await rq.get_poll_by_id_and_creator(poll_id, user_id)
+        if not polls:
             await message.answer(
                 "Вопрос с таким ID не найден среди ваших вопросов. Попробуйте снова."
             )

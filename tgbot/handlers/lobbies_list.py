@@ -12,16 +12,16 @@ async def show_lobbies_list(message: Message):
     user_id = message.from_user.id  # ID пользователя Telegram
 
     # Получаем список опросов из базы данных
-    lobbies = await rq.get_lobbies(user_id)
+    polls = await rq.get_lobbies(user_id)
 
     # Если у пользователя нет созданных опросов
-    if not lobbies:
+    if not polls:
         await message.answer("У вас нет созданных опросов.")
 
     else:
         # Формируем сообщение со списком опросов
         response = "Ваши созданные опросы:\n\n"
-        for lobby_id, poll_id, creator_id in lobbies:
+        for lobby_id, poll_id, creator_id in polls:
             response += f" - Опрос #{lobby_id} с вопросом #{poll_id}\n"
 
         # Отправляем пользователю список опросов
