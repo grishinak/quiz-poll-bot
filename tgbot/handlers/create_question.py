@@ -95,7 +95,7 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
     creator_id = callback.from_user.id
     try:
         # Сохраняем опрос в базе данных
-        poll_id = await rq.set_poll(
+        poll_id = await rq.set_question(
             # name=data["name"],
             name=None,
             question=data["question"],

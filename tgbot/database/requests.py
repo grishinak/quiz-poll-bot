@@ -28,7 +28,7 @@ async def set_user(tg_id, first_name=None, last_name=None):
 
 
 # add polls data to db from check_true in create_question fsm
-async def set_poll(name: str, question: str, answer: str, creator_id: int):
+async def set_question(name: str, question: str, answer: str, creator_id: int):
     async with async_session() as session:
         polls = Question(
             name=name, question=question, answer=answer, creator_id=creator_id
