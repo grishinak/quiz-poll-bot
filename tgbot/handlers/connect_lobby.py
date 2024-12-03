@@ -18,14 +18,14 @@ class LobbyState(StatesGroup):
 # обработка нажатия кнопки from /start и переход в состояние
 @router.callback_query(F.data == "connect_lobby")
 async def clb_connect_lobby(callback: CallbackQuery, state: FSMContext):
-    await callback.answer("Вы подключаетесь к лобби.")
-    await callback.message.answer("К какому лобби вы хотите подключиться?")
+    await callback.answer("Вы подключаетесь к опросу.")
+    await callback.message.answer("К какому опросу вы хотите подключиться?")
     await state.set_state(LobbyState.waiting_for_lobby_id)
 
 
 @router.message(Command("connect_lobby"))
 async def cmd_connect_lobby(message: Message, state: FSMContext):
-    await message.answer("К какому лобби вы хотите подключиться?")
+    await message.answer("К какому опросу вы хотите подключиться?")
     await state.set_state(LobbyState.waiting_for_lobby_id)
 
 
@@ -34,20 +34,20 @@ async def process_lobby_id(message: Message, state: FSMContext):
     try:
         lobby_id = int(message.text)
     except ValueError:
-        await message.answer("Пожалуйста, введите действительный ID лобби.")
+        await message.answer("Пожалуйста, введите действительный ID опроса.")
         return
 
     if not await rq.check_lobby_exists(lobby_id):
-        await message.answer("Лобби не существует.")
+        await message.answer("Опроса не существует.")
         return
 
     if await rq.check_if_participant_exists(lobby_id, message.from_user.id):
-        await message.answer("Вы уже подключены к этому лобби!")
+        await message.answer("Вы уже подключены к этому опросу!")
         return
 
     await rq.set_lobby_participant(lobby_id, message.from_user.id)
     await state.update_data(lobby_id=message.text)
-    await message.answer(f"Вы успешно подключились к лобби #{lobby_id}!")
+    await message.answer(f"Вы успешно подключились к опросу #{lobby_id}!")
 
     # TODO: go to state to give answer if creater sterted.
 

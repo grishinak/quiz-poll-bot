@@ -16,13 +16,13 @@ async def show_lobbies_list(message: Message):
 
     # Если у пользователя нет созданных опросов
     if not lobbies:
-        await message.answer("У вас нет созданных лобби.")
+        await message.answer("У вас нет созданных опросов.")
 
     else:
         # Формируем сообщение со списком опросов
-        response = "Ваши созданные лобби:\n\n"
+        response = "Ваши созданные опросы:\n\n"
         for lobby_id, poll_id, creator_id in lobbies:
-            response += f" - Лобби #{lobby_id} с опросом #{poll_id}\n"
+            response += f" - Опрос #{lobby_id} с вопросом #{poll_id}\n"
 
         # Отправляем пользователю список опросов
         await message.answer(response)

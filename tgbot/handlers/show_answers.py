@@ -15,17 +15,17 @@ async def show_lobby_users(message: Message):
     lobby_data = await get_lobby_data(user_id)
 
     if not lobby_data:
-        await message.answer("У вас нет лобби с участниками.")
+        await message.answer("У вас нет опросов с участниками.")
         return
 
     # Формируем сообщение с данными
-    response = " Ответы участников в ваших лобби:\n\n"
+    response = " Ответы участников в ваших опросах:\n\n"
     current_lobby_id = None
 
     for data in lobby_data:
         if data["lobby_id"] != current_lobby_id:
             current_lobby_id = data["lobby_id"]
-            response += f"🚪 Лобби #{current_lobby_id} (Опрос #{data['polls_id']}, Название:'{data['polls_name']})':\n"
+            response += f"🚪 Лобби #{current_lobby_id} (Опрос #{data['polls_id']}, Название:'{data['question']})':\n"
 
         response += (
             f"\t\t 👤 {data['first_name']} {data['last_name']}: {data['answer']}\n"
@@ -43,17 +43,17 @@ async def show_lobby_users_clb(callback: CallbackQuery):
     lobby_data = await get_lobby_data(user_id)
 
     if not lobby_data:
-        await callback.message.answer("У вас нет лобби с участниками.")
+        await callback.message.answer("У вас нет опросов с участниками.")
         return
 
     # Формируем сообщение с данными
-    response = " Ответы участников в ваших лобби:\n\n"
+    response = " Ответы участников в ваших опросах:\n\n"
     current_lobby_id = None
 
     for data in lobby_data:
         if data["lobby_id"] != current_lobby_id:
             current_lobby_id = data["lobby_id"]
-            response += f"🚪 Лобби #{current_lobby_id} (Вопрос #{data['polls_id']}, '{data['question']}'):\n"
+            response += f"🚪 Опрос #{current_lobby_id} (Вопрос #{data['polls_id']}, '{data['question']}'):\n"
 
         response += (
             f"\t\t 👤 {data['first_name']} {data['last_name']}: {data['answer']}\n"
