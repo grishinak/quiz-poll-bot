@@ -63,6 +63,11 @@ end_menu = InlineKeyboardMarkup(
                 callback_data="create_poll",
             )
         ],
+        [
+            InlineKeyboardButton(
+                text="Получить список опросов", callback_data="polls_list"
+            )
+        ],
     ]
 )
 
