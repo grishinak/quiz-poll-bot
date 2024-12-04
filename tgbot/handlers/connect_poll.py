@@ -65,31 +65,29 @@ async def give_answer_handler(callback: CallbackQuery, state: FSMContext):
 async def process_answer(message: Message, state: FSMContext):
     await state.update_data(answer=message.text)
     data = await state.get_data()  # get all data about polls from user
-    await message.answer(
-        f"Все ли верно?\n\nОтвет: {data['answer']}",
-        reply_markup=kb.check_menu,  # buttons for check
-    )
+    #     await message.answer(
+    #         f"Все ли верно?\n\nОтвет: {data['answer']}",
+    #         reply_markup=kb.check_menu,  # buttons for check
+    #     )
 
+    # # Обработка нажатия кнопки (from answer) и переход в состояние
+    # @router.callback_query(F.data == "check_answer_false")
+    # async def process_check_false(callback: CallbackQuery, state: FSMContext):
+    #     await callback.message.edit_text("Данные не верны.")
+    #     await callback.answer("Сначала")  # alert
+    #     await callback.message.answer("Вы начали ввод ответа сначала!")  # message in chat
 
-# Обработка нажатия кнопки (from answer) и переход в состояние
-@router.callback_query(F.data == "check_answer_false")
-async def process_check_false(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("Данные не верны.")
-    await callback.answer("Сначала")  # alert
-    await callback.message.answer("Вы начали ввод ответа сначала!")  # message in chat
+    #     await state.set_state(PollState.answer)  # goes to state
+    #     await callback.message.answer("Введите ваш ответ: ")
 
-    await state.set_state(PollState.answer)  # goes to state
-    await callback.message.answer("Введите ваш ответ: ")
-
-
-# Обработка нажатия кнопки (from answer) и переход в состояние
-@router.callback_query(F.data == "check_answer_true")
-async def process_check_true(callback: CallbackQuery, state: FSMContext):
-    await callback.answer("Успешно")  # alert
-    await callback.message.edit_text("Данные верны.", reply_markup=None)
+    # # Обработка нажатия кнопки (from answer) и переход в состояние
+    # @router.callback_query(F.data == "check_answer_true")
+    # async def process_check_true(callback: CallbackQuery, state: FSMContext):
+    #     await callback.answer("Успешно")  # alert
+    #     await callback.message.edit_text("Данные верны.", reply_markup=None)
     data = await state.get_data()
 
-    participant_id = callback.from_user.id
+    participant_id = message.from_user.id
     try:
         if await rq.is_poll_collecting(data["lobby_id"]):
             answer_id = await rq.set_answer(
@@ -99,15 +97,13 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
             )
 
             # Отправляем сообщение пользователю о том, что опрос сохранен
-            await callback.message.answer(f"Ваш ответ '{data['answer']}' сохранен!")
+            await message.answer(f"Ваш ответ '{data['answer']}' сохранен!")
         else:
-            await callback.message.answer(
-                f"Время для ответа вышло. Опрос уже завершен."
-            )
+            await message.answer(f"Время для ответа вышло. Опрос уже завершен.")
 
     except Exception as e:
         # Если произошла ошибка, информируем пользователя
-        await callback.message.answer(
+        await message.answer(
             "Произошла ошибка при сохранении ответа. Попробуйте снова."
         )
         print(f"Ошибка при сохранении ответа: {e}")
