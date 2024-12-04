@@ -12,6 +12,7 @@ router = Router()
 # FSM для подключения к опросу
 class PollState(StatesGroup):
     waiting_for_poll_id = State()
+    waiting_for_start_poll = State()
     answer = State()
 
 
@@ -48,8 +49,14 @@ async def process_poll_id(message: Message, state: FSMContext):
     await rq.set_poll_participant(lobby_id, message.from_user.id)
     await state.update_data(lobby_id=message.text)
     await message.answer(f"Вы успешно подключились к опросу #{lobby_id}!")
+    await state.set_state(PollState.waiting_for_start_poll)
 
     # await state.clear()
+
+
+@router.message(PollState.waiting_for_start_poll)
+async def process_answer(message: Message, state: FSMContext):
+    await message.answer("Организатор еще не начал опрос, подождите.")
 
 
 # Обработка нажатия кнопки (from start) и переход в состояние
