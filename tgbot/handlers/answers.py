@@ -6,7 +6,7 @@ from database.requests import get_poll_data
 router = Router()
 
 
-@router.message(Command("show_answers"))
+@router.message(Command("answers"))
 async def show_poll_users(message: Message):
 
     user_id = message.from_user.id  # ID пользователя Telegram
@@ -34,7 +34,7 @@ async def show_poll_users(message: Message):
     await message.answer(response)
 
 
-@router.callback_query(F.data == "show_answers")
+@router.callback_query(F.data == "answers")
 async def show_lobby_users_clb(callback: CallbackQuery):
     callback.answer("Вы получаете список ответов")
     user_id = callback.from_user.id  # ID пользователя Telegram

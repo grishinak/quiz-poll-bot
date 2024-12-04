@@ -9,12 +9,9 @@ from aiogram import Bot, Dispatcher
 # importing all routers
 from handlers.start import router as start_router
 from handlers.help import router as help_router
-from handlers.create_question import router as create_question_router
-from handlers.questions_list import router as questions_list_router
-from handlers.create_poll import router as create_poll_router
-from handlers.polls_list import router as polls_list_router
-from handlers.connect_poll import router as connect_polls_router
-from handlers.show_answers import router as show_answers_router
+from handlers.questions import router as questions_router
+from handlers.polls import router as polls_router
+from handlers.answers import router as show_answers_router
 
 # db
 from database.models import async_main
@@ -28,11 +25,8 @@ async def main():
     for router in [
         start_router,
         help_router,
-        create_question_router,
-        questions_list_router,
-        create_poll_router,
-        polls_list_router,
-        connect_polls_router,
+        questions_router,
+        polls_router,
         show_answers_router,
     ]:
         dp.include_router(router)

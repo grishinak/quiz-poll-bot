@@ -1,15 +1,24 @@
 from aiogram import Router, F
-from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
+from aiogram.filters import Command
 
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 import database.requests as rq
-import keyboards.create_question as kb
+import keyboards.questions as kb
 
 
 router = Router()
+
+
+# /question handler
+@router.message(Command("questions"))
+async def cmd_help(message: Message):
+    await message.answer(
+        "Что вы хотите сделать с вопросами?", reply_markup=kb.questions_menu
+    )
+
 
 # class with fsm states
 class CreateQuestion(StatesGroup):
@@ -28,25 +37,6 @@ async def process_create_poll_clb(callback: CallbackQuery, state: FSMContext):
 
     await state.set_state(CreateQuestion.question)  # goes to state
     await callback.message.answer("Введите вопрос:")
-
-
-# Обработка команды и переход в состояние
-@router.message(Command("create_question"))
-async def process_create_poll_cmd(message: Message, state: FSMContext):
-    await message.answer("Вы начали создание вопроса!")  # message in chat
-
-    # await state.set_state(CreateQuestion.name)  # goes to state
-    # await message.answer("Введите название опроса:")
-
-    await state.set_state(CreateQuestion.question)  # goes to state
-    await message.answer("Введите вопрос:")
-
-
-# @router.message(CreateQuestion.name)
-# async def process_name(message: Message, state: FSMContext):
-#     await state.update_data(name=message.text)
-#     await state.set_state(CreateQuestion.question)
-#     await message.answer("Введите вопрос:")
 
 
 @router.message(CreateQuestion.question)
@@ -115,3 +105,27 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
         print(f"Ошибка при сохранении вопроса: {e}")
 
     await state.clear()
+
+
+@router.callback_query(F.data == "questions_list")
+async def show_poll_list_clb(callback: CallbackQuery):
+    callback.answer("Список вопросов.")
+    user_id = callback.from_user.id  # ID пользователя Telegram
+
+    # Получаем список опросов из базы данных
+    questions = await rq.get_questions(user_id)
+
+    # Если у пользователя нет созданных опросов
+    if not questions:
+        await callback.message.answer("У вас нет созданных вопросов.")
+
+    else:
+        # Формируем сообщение со списком опросов
+        response = "Ваши созданные вопросы:\n\n"
+        for poll_id, poll_question, poll_answer in questions:
+            response += (
+                f"📝 Вопрос #{poll_id}: {poll_question}\n\tОтвет: {poll_answer}\n\n"
+            )
+
+        # Отправляем пользователю список опросов
+        await callback.message.answer(response, reply_markup=kb.create_poll)

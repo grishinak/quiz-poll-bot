@@ -1,6 +1,22 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
+polls_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="Создать опрос", callback_data="create_poll")],
+        [
+            InlineKeyboardButton(text="Ваши опросы", callback_data="polls_list"),
+            InlineKeyboardButton(text="Ваши вопросы", callback_data="questions_list"),
+        ],
+        [
+            InlineKeyboardButton(
+                text="Подключиться к опросу", callback_data="connect_poll"
+            )
+        ],
+    ]
+)
+
+
 def create_start_stop_poll_keyboard(lobby_id: int) -> InlineKeyboardMarkup:
     """
     Создает клавиатуру для управления лобби (кнопки "Начать" и "Завершить").
@@ -47,11 +63,7 @@ give_answer = InlineKeyboardMarkup(
 
 end_menu = InlineKeyboardMarkup(
     inline_keyboard=[
-        [
-            InlineKeyboardButton(
-                text="Получить список ответов", callback_data="show_answers"
-            )
-        ],
+        [InlineKeyboardButton(text="Получить список ответов", callback_data="answers")],
         [
             InlineKeyboardButton(
                 text="Создать новый вопрос", callback_data="create_question"
@@ -76,7 +88,7 @@ participants_end_menu = InlineKeyboardMarkup(
         # TODO: we may send participants results?
         #     [
         #         InlineKeyboardButton(
-        #             text="Получить список ответов", callback_data="show_answers"
+        #             text="Получить список ответов", callback_data="answers"
         #         )
         #     ],
         [
@@ -89,5 +101,21 @@ participants_end_menu = InlineKeyboardMarkup(
                 text="Создать свой вопрос", callback_data="create_question"
             )
         ],
+    ]
+)
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+# button for check states in fsm create_question
+check_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Да, сохранить мой ответ", callback_data="check_answer_true"
+            ),
+            InlineKeyboardButton(
+                text="Нет, ввести еще раз", callback_data="check_answer_false"
+            ),
+        ]
     ]
 )
