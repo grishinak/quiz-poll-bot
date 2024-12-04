@@ -24,7 +24,6 @@ class Question(Base):
     __tablename__ = "questions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(50), default=None, nullable=True)  ###
     question: Mapped[str] = mapped_column(String(250))
     answer: Mapped[str] = mapped_column(String(250))
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

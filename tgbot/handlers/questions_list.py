@@ -46,7 +46,7 @@ async def show_poll_list_clb(callback: CallbackQuery):
     else:
         # Формируем сообщение со списком опросов
         response = "Ваши созданные вопросы:\n\n"
-        for poll_id, poll_name, poll_question, poll_answer in questions:
+        for poll_id, poll_question, poll_answer in questions:
             response += (
                 f"📝 Вопрос #{poll_id}: {poll_question}\n\tОтвет: {poll_answer}\n\n"
             )

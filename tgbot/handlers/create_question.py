@@ -13,7 +13,6 @@ router = Router()
 
 # class with fsm states
 class CreateQuestion(StatesGroup):
-    # name = State()
     question = State()
     answer = State()
 
@@ -96,8 +95,6 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
     try:
         # Сохраняем опрос в базе данных
         poll_id = await rq.set_question(
-            # name=data["name"],
-            name=None,
             question=data["question"],
             answer=data["answer"],
             creator_id=creator_id,

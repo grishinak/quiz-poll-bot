@@ -28,11 +28,9 @@ async def set_user(tg_id, first_name=None, last_name=None):
 
 
 # add polls data to db from check_true in create_question fsm
-async def set_question(name: str, question: str, answer: str, creator_id: int):
+async def set_question(question: str, answer: str, creator_id: int):
     async with async_session() as session:
-        polls = Question(
-            name=name, question=question, answer=answer, creator_id=creator_id
-        )
+        polls = Question(question=question, answer=answer, creator_id=creator_id)
         session.add(polls)
 
         # Фиксируем изменения в базе данных
@@ -50,9 +48,9 @@ async def get_questions(user_id: int):
         async with session.begin():
             # Выбираем только необходимые данные, чтобы избежать привязки к сессии
             result = await session.execute(
-                select(
-                    Question.id, Question.name, Question.question, Question.answer
-                ).where(Question.creator_id == user_id)
+                select(Question.id, Question.question, Question.answer).where(
+                    Question.creator_id == user_id
+                )
             )
             # Возвращаем список кортежей, который можно использовать вне сессии
             return result.all()
@@ -219,7 +217,7 @@ async def get_poll_data(creator_tg_id: int):
     query = text(
         """
     SELECT polls.id, poll_participants.id, answers.answer,
-    users.first_name,users.last_name, questions.name,questions.id, questions.question
+    users.first_name,users.last_name, questions.id, questions.question
     FROM polls
     JOIN poll_participants ON poll_participants.lobby_id=polls.id
     JOIN answers ON poll_participants.id=answers.id
@@ -240,9 +238,8 @@ async def get_poll_data(creator_tg_id: int):
                 "answer": row[2],
                 "first_name": row[3],
                 "last_name": row[4],
-                "polls_name": row[5],
-                "polls_id": row[6],
-                "question": row[7],
+                "polls_id": row[5],
+                "question": row[6],
             }
             for row in rows
         ]
