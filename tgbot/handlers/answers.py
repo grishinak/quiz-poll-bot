@@ -25,7 +25,7 @@ async def show_poll_users(message: Message):
     for data in poll_data:
         if data["lobby_id"] != current_poll_id:
             current_poll_id = data["lobby_id"]
-            response += f"🚪 Лобби #{current_poll_id} (Опрос #{data['polls_id']}, Название:'{data['question']})':\n"
+            response += f"🚪 Опрос #{current_poll_id} (Вопрос #{data['polls_id']}, '{data['question']}'):\n"
 
         response += (
             f"\t\t 👤 {data['first_name']} {data['last_name']}: {data['answer']}\n"
