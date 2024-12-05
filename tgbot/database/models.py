@@ -1,8 +1,13 @@
+# importing for .env
+import os
+from dotenv import load_dotenv
+
 from sqlalchemy import BigInteger, String, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 
-engine = create_async_engine(url="sqlite+aiosqlite:///db.sqlite3")
+load_dotenv()
+engine = create_async_engine(url=os.getenv("DB_URL"))
 
 async_session = async_sessionmaker(engine)
 
@@ -59,5 +64,6 @@ class Answer(Base):
 
 # create all models
 async def async_main():
+
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
