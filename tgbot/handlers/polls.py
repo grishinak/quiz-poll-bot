@@ -81,7 +81,7 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
             participant_id, f"Вопрос: {question}", reply_markup=kb.give_answer
         )
 
-    await callback.message.answer(
+    await callback.message.edit_text(
         "Опрос начат! Участники получили вопрос.",
         reply_markup=kb.create_stop_poll_keyboard(lobby_id),
     )
