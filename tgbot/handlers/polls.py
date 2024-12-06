@@ -51,6 +51,8 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
             f"Опрос #{lobby_id} успешно создан! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",
             reply_markup=kb.create_start_stop_poll_keyboard(lobby_id),
         )
+        ###
+
     except Exception as e:
         await message.answer("Произошла ошибка при создании опроса. Попробуйте снова.")
         print(f"Ошибка при создании опроса: {e}")
@@ -79,7 +81,7 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
             participant_id, f"Вопрос: {question}", reply_markup=kb.give_answer
         )
 
-    await callback.message.edit_text(
+    await callback.message.answer(
         "Опрос начат! Участники получили вопрос.",
         reply_markup=kb.create_stop_poll_keyboard(lobby_id),
     )
@@ -143,7 +145,7 @@ async def clb_connect_poll(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(PollState.waiting_for_poll_id)
-async def process_poll_id(message: Message, state: FSMContext):
+async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
     try:
         lobby_id = int(message.text)
     except ValueError:
@@ -158,12 +160,22 @@ async def process_poll_id(message: Message, state: FSMContext):
         await message.answer("Вы уже подключены к этому опросу!")
         return
 
+    # Добавляем участника
     await rq.set_poll_participant(lobby_id, message.from_user.id)
     await state.update_data(lobby_id=message.text)
     await message.answer(f"Вы успешно подключились к опросу #{lobby_id}!")
-    await state.set_state(PollState.waiting_for_start_poll)
 
-    # await state.clear()
+    # Получаем идентификатор создателя
+    creator_id = await rq.get_poll_creator_id(lobby_id)
+
+    # Уведомляем создателя
+    if creator_id:
+        await bot.send_message(
+            creator_id,
+            f"К вашему опросу #{lobby_id} подключился новый участник: {message.from_user.full_name}.",
+        )
+
+    await state.set_state(PollState.waiting_for_start_poll)
 
 
 @router.message(PollState.waiting_for_start_poll)

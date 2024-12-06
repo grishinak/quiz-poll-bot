@@ -309,3 +309,11 @@ async def delete_user_polls_and_questions(user_tg_id: int):
             await session.delete(question)
 
         await session.commit()
+
+
+async def get_poll_creator_id(lobby_id: int) -> int | None:
+    async with async_session() as session:
+        result = await session.execute(
+            select(Poll.creator_id).where(Poll.id == lobby_id)
+        )
+        return result.scalar_one_or_none()
