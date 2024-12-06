@@ -69,5 +69,5 @@ async def show_last_lobby_users_clb(callback: CallbackQuery):
         response += (
             f"\t\t 👤 {data['first_name']} {data['last_name']}: {data['answer']}\n"
         )
-    print(data)  # logging info
+    # print(data)  # logging info
     await callback.message.answer(response)

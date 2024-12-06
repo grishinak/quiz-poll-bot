@@ -1,6 +1,7 @@
 from database.models import async_session
 from database.models import User, Question, Poll, PollParticipant, Answer
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, update, BigInteger
+
 
 # func for setting user data from /start
 async def set_user(tg_id, first_name=None, last_name=None):
@@ -102,17 +103,13 @@ async def get_polls(user_id: int):
 
 
 # add lobby_participant data to db from ???
-async def set_poll_participant(lobby_id: int, user_id: int):
+async def set_poll_participant(lobby_id: int, user_tg_id: BigInteger):
     async with async_session() as session:
-        lobby_participant = PollParticipant(lobby_id=lobby_id, user_id=user_id)
+        lobby_participant = PollParticipant(lobby_id=lobby_id, user_tg_id=user_tg_id)
         session.add(lobby_participant)
 
         # Фиксируем изменения в базе данных
         await session.commit()
-
-
-from sqlalchemy.future import select
-from database.models import Question
 
 
 async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
@@ -141,19 +138,20 @@ async def check_poll_exists(lobby_id: int):
 
 
 # Проверка, является ли пользователь участником лобби
-async def check_if_participant_exists(lobby_id: int, user_id: int):
+async def check_if_participant_exists(lobby_id: int, user_tg_id: BigInteger):
     async with async_session() as session:
         stmt = select(PollParticipant).filter(
-            PollParticipant.lobby_id == lobby_id, PollParticipant.user_id == user_id
+            PollParticipant.lobby_id == lobby_id,
+            PollParticipant.user_tg_id == user_tg_id,
         )
         result = await session.execute(stmt)
         return result.scalars().first() is not None
 
 
 # Добавление участника в лобби
-async def set_poll_participant(lobby_id: int, user_id: int):
+async def set_poll_participant(lobby_id: int, user_tg_id: int):
     async with async_session() as session:
-        participant = PollParticipant(lobby_id=lobby_id, user_id=user_id)
+        participant = PollParticipant(lobby_id=lobby_id, user_tg_id=user_tg_id)
         session.add(participant)
         await session.commit()
         return participant
@@ -173,9 +171,11 @@ async def get_poll_question(poll_id: int):
 async def get_poll_participants(lobby_id: int):
     async with async_session() as session:
         result = await session.execute(
-            select(PollParticipant.user_id).filter(PollParticipant.lobby_id == lobby_id)
+            select(PollParticipant.user_tg_id).filter(
+                PollParticipant.lobby_id == lobby_id
+            )
         )
-        return [row.user_id for row in result.all()]
+        return [row.user_tg_id for row in result.all()]
 
 
 async def get_poll_id_for_lobby(lobby_id: int):
@@ -210,36 +210,37 @@ async def set_answer(lobby_id: int, participant_id: int, user_answer: str):
         return answer
 
 
-from sqlalchemy.sql import text
-
-
 async def get_poll_data(creator_tg_id: int):
-    query = text(
-        """
-    SELECT polls.id, poll_participants.id, answers.answer,
-    users.first_name,users.last_name, questions.id, questions.question
-    FROM polls
-    JOIN poll_participants ON poll_participants.lobby_id=polls.id
-    JOIN answers ON poll_participants.id=answers.id
-    JOIN users ON users.tg_id=poll_participants.user_id
-    JOIN questions ON questions.id=polls.poll_id
-
-    WHERE polls.creator_id = :creator_tg_id;
-    """
-    )
-
     async with async_session() as session:
-        result = await session.execute(query, {"creator_tg_id": creator_tg_id})
-        rows = result.fetchall()
+        # Создаем запрос с использованием ORM
+        result = await session.execute(
+            select(
+                Poll.id.label("lobby_id"),
+                PollParticipant.id.label("participant_id"),
+                Answer.answer.label("answer"),
+                User.first_name.label("first_name"),
+                User.last_name.label("last_name"),
+                Question.id.label("polls_id"),
+                Question.question.label("question"),
+            )
+            .join(PollParticipant, PollParticipant.lobby_id == Poll.id)
+            .join(Answer, Answer.id == PollParticipant.id)
+            .join(User, User.tg_id == PollParticipant.user_tg_id)
+            .join(Question, Question.id == Poll.poll_id)
+            .where(Poll.creator_id == creator_tg_id)
+        )
+
+        # Преобразуем результат в список словарей
+        rows = result.all()
         return [
             {
-                "lobby_id": row[0],
-                "participant_id": row[1],
-                "answer": row[2],
-                "first_name": row[3],
-                "last_name": row[4],
-                "polls_id": row[5],
-                "question": row[6],
+                "lobby_id": row.lobby_id,
+                "participant_id": row.participant_id,
+                "answer": row.answer,
+                "first_name": row.first_name,
+                "last_name": row.last_name,
+                "polls_id": row.polls_id,
+                "question": row.question,
             }
             for row in rows
         ]
@@ -247,20 +248,20 @@ async def get_poll_data(creator_tg_id: int):
 
 async def update_poll_collecting_status(lobby_id: int, is_collecting: bool):
     async with async_session() as session:
+        # Создаем запрос на обновление
         await session.execute(
-            text(
-                "UPDATE polls SET is_collecting = :is_collecting WHERE id = :lobby_id"
-            ),
-            {"is_collecting": is_collecting, "lobby_id": lobby_id},
+            update(Poll).where(Poll.id == lobby_id).values(is_collecting=is_collecting)
         )
+        # Фиксируем изменения
         await session.commit()
 
 
 async def is_poll_collecting(lobby_id: int) -> bool:
     async with async_session() as session:
+        # Создаем запрос на выборку
         result = await session.execute(
-            text("SELECT is_collecting FROM polls WHERE id = :lobby_id"),
-            {"lobby_id": lobby_id},
+            select(Poll.is_collecting).where(Poll.id == lobby_id)
         )
+        # Извлекаем значение
         row = result.scalar()
         return bool(row) if row is not None else False

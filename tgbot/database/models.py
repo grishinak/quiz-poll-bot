@@ -48,7 +48,7 @@ class PollParticipant(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_tg_id: Mapped[int] = mapped_column(BigInteger)
 
 
 class Answer(Base):
