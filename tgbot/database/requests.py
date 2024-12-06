@@ -1,6 +1,6 @@
 from database.models import async_session
 from database.models import User, Question, Poll, PollParticipant, Answer
-from sqlalchemy import select, insert, update, BigInteger
+from sqlalchemy import select, insert, update, delete, BigInteger
 
 
 # func for setting user data from /start
@@ -265,3 +265,57 @@ async def is_poll_collecting(lobby_id: int) -> bool:
         # Извлекаем значение
         row = result.scalar()
         return bool(row) if row is not None else False
+
+
+async def delete_user_polls_and_questions(user_tg_id: int):
+    async with async_session() as session:
+        # Найти пользователя
+        user = await session.execute(select(User).where(User.tg_id == user_tg_id))
+        user = user.scalar_one_or_none()
+
+        if not user:
+            print("Пользователь не найден.")
+            return  # Пользователь не найден, нечего удалять.
+
+        print(f"Пользователь найден: {user.id}")
+
+        # Найти вопросы, созданные пользователем
+        questions = await session.execute(
+            select(Question).where(
+                Question.creator_id == user.tg_id
+            )  # Используем user.id
+        )
+        questions = questions.scalars().all()
+        print(f"Найдено вопросов: {len(questions)}")
+
+        # Найти опросы, созданные пользователем
+        polls = await session.execute(
+            select(Poll).where(Poll.creator_id == user.tg_id)  # Используем user.id
+        )
+        polls = polls.scalars().all()
+        print(f"Найдено опросов: {len(polls)}")
+
+        # Найти и удалить ответы, связанные с опросами пользователя
+        poll_ids = [poll.id for poll in polls]
+        if poll_ids:
+            print(f"Удаление ответов для опросов: {poll_ids}")
+            await session.execute(delete(Answer).where(Answer.lobby_id.in_(poll_ids)))
+
+            # Удалить участников, связанные с опросами пользователя
+            print(f"Удаление участников для опросов: {poll_ids}")
+            await session.execute(
+                delete(PollParticipant).where(PollParticipant.lobby_id.in_(poll_ids))
+            )
+
+        # Удалить опросы
+        for poll in polls:
+            print(f"Удаление опроса: {poll.id}")
+            await session.delete(poll)
+
+        # Удалить вопросы
+        for question in questions:
+            print(f"Удаление вопроса: {question.id}")
+            await session.delete(question)
+
+        await session.commit()
+        print("Удаление завершено.")
