@@ -274,10 +274,7 @@ async def delete_user_polls_and_questions(user_tg_id: int):
         user = user.scalar_one_or_none()
 
         if not user:
-            print("Пользователь не найден.")
             return  # Пользователь не найден, нечего удалять.
-
-        print(f"Пользователь найден: {user.id}")
 
         # Найти вопросы, созданные пользователем
         questions = await session.execute(
@@ -286,36 +283,29 @@ async def delete_user_polls_and_questions(user_tg_id: int):
             )  # Используем user.id
         )
         questions = questions.scalars().all()
-        print(f"Найдено вопросов: {len(questions)}")
 
         # Найти опросы, созданные пользователем
         polls = await session.execute(
             select(Poll).where(Poll.creator_id == user.tg_id)  # Используем user.id
         )
         polls = polls.scalars().all()
-        print(f"Найдено опросов: {len(polls)}")
 
         # Найти и удалить ответы, связанные с опросами пользователя
         poll_ids = [poll.id for poll in polls]
         if poll_ids:
-            print(f"Удаление ответов для опросов: {poll_ids}")
             await session.execute(delete(Answer).where(Answer.lobby_id.in_(poll_ids)))
 
             # Удалить участников, связанные с опросами пользователя
-            print(f"Удаление участников для опросов: {poll_ids}")
             await session.execute(
                 delete(PollParticipant).where(PollParticipant.lobby_id.in_(poll_ids))
             )
 
         # Удалить опросы
         for poll in polls:
-            print(f"Удаление опроса: {poll.id}")
             await session.delete(poll)
 
         # Удалить вопросы
         for question in questions:
-            print(f"Удаление вопроса: {question.id}")
             await session.delete(question)
 
         await session.commit()
-        print("Удаление завершено.")

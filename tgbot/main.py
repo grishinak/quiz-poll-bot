@@ -13,6 +13,7 @@ from handlers.help import router as help_router
 from handlers.questions import router as questions_router
 from handlers.polls import router as polls_router
 from handlers.answers import router as show_answers_router
+from handlers.drop import router as drop_router
 from handlers.commands import set_commands
 
 # db
@@ -31,6 +32,7 @@ async def main():
         questions_router,
         polls_router,
         show_answers_router,
+        drop_router,
     ]:
         dp.include_router(router)
     await dp.start_polling(bot)
