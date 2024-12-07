@@ -230,13 +230,11 @@ async def process_answer(message: Message, state: FSMContext):
             # Отправляем сообщение пользователю о том, что опрос сохранен
             await message.answer(f"Ваш ответ '{data['answer']}' сохранен!")
         else:
-            await message.answer(f"Время для ответа вышло. Опрос уже завершен.")
+            await message.answer(f"Время для ответа вышло. Ваш ответ не сохранен.")
 
     except Exception as e:
         # Если произошла ошибка, информируем пользователя
-        await message.answer(
-            "Произошла ошибка при сохранении ответа. Попробуйте снова."
-        )
+        await message.answer("Произошла ошибка при сохранении ответа. Вы уже отвечали.")
         print(f"Ошибка при сохранении ответа: {e}")
 
     await state.clear()

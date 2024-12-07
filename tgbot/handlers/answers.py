@@ -25,7 +25,7 @@ async def show_lobby_users_clb(callback: CallbackQuery):
     poll_data = await get_poll_data(user_id)
 
     if not poll_data:
-        await callback.message.answer("У вас нет опросов с участниками.")
+        await callback.message.answer("У вас нет опросов с ответами участников.")
         return
 
     # Формируем сообщение с данными
