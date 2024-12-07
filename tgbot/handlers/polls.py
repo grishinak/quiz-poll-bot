@@ -9,6 +9,7 @@ import keyboards.polls as kb
 
 router = Router()
 
+
 # /question handler
 @router.message(Command("polls"))
 async def cmd_help(message: Message):
@@ -34,7 +35,7 @@ async def process_create_lobby_clb(callback: CallbackQuery, state: FSMContext):
 
 @router.message(CreatePoll.polls)
 async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
-    poll_id = message.text.strip()
+    poll_id = int(message.text.strip())
     user_id = message.from_user.id
 
     try:
@@ -220,9 +221,9 @@ async def process_answer(message: Message, state: FSMContext):
 
     participant_id = message.from_user.id
     try:
-        if await rq.is_poll_collecting(data["lobby_id"]):
+        if await rq.is_poll_collecting(int(data["lobby_id"])):
             answer_id = await rq.set_answer(
-                lobby_id=data["lobby_id"],
+                lobby_id=int(data["lobby_id"]),
                 participant_id=participant_id,
                 user_answer=data["answer"],
             )

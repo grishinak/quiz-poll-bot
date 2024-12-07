@@ -192,7 +192,7 @@ async def get_poll_id_for_lobby(lobby_id: int):
 
 
 # Сохранение ответа пользователя
-async def set_answer(lobby_id: int, participant_id: int, user_answer: str):
+async def set_answer(lobby_id: int, participant_id: BigInteger, user_answer: str):
     """
     Сохраняет ответ пользователя в базе данных.
 
@@ -216,7 +216,7 @@ async def get_poll_data(creator_tg_id: int):
         result = await session.execute(
             select(
                 Poll.id.label("lobby_id"),
-                PollParticipant.id.label("participant_id"),
+                PollParticipant.user_tg_id.label("participant_id"),
                 Answer.answer.label("answer"),
                 User.first_name.label("first_name"),
                 User.last_name.label("last_name"),
@@ -224,7 +224,7 @@ async def get_poll_data(creator_tg_id: int):
                 Question.question.label("question"),
             )
             .join(PollParticipant, PollParticipant.lobby_id == Poll.id)
-            .join(Answer, Answer.id == PollParticipant.id)
+            .join(Answer, Answer.lobby_participant_id == PollParticipant.user_tg_id)
             .join(User, User.tg_id == PollParticipant.user_tg_id)
             .join(Question, Question.id == Poll.poll_id)
             .where(Poll.creator_id == creator_tg_id)

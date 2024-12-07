@@ -2,68 +2,75 @@
 import os
 from dotenv import load_dotenv
 
-from sqlalchemy import BigInteger, String, ForeignKey
+from sqlalchemy import BigInteger, String, ForeignKey, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 
+# Load environment variables
 load_dotenv()
-engine = create_async_engine(url=os.getenv("DB_URL"))
 
+# Create the async engine and session
+engine = create_async_engine(url=os.getenv("DB_URL"))
 async_session = async_sessionmaker(engine)
 
-# base class
+
+# Base class
 class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 
+# User model
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    tg_id = mapped_column(BigInteger)
+    tg_id = mapped_column(BigInteger, primary_key=True)  # Add unique constraint
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50), nullable=True)
 
 
+# Question model
 class Question(Base):
     __tablename__ = "questions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     question: Mapped[str] = mapped_column(String(250))
     answer: Mapped[str] = mapped_column(String(250))
-    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
 
 
+# Poll model
 class Poll(Base):
     __tablename__ = "polls"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
-    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    is_collecting: Mapped[bool] = mapped_column(default=True)  # Новый флаг
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
+    is_collecting: Mapped[bool] = mapped_column(
+        Boolean, default=True
+    )  # Use Boolean type
 
 
+# PollParticipant model
 class PollParticipant(Base):
     __tablename__ = "poll_participants"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    user_tg_id: Mapped[int] = mapped_column(BigInteger)
+    user_tg_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
 
 
+# Answer model
 class Answer(Base):
     __tablename__ = "answers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    lobby_participant_id: Mapped[int] = mapped_column(
-        ForeignKey("poll_participants.id")
+    lobby_participant_id: Mapped[BigInteger] = mapped_column(
+        ForeignKey("poll_participants.user_tg_id")
     )
     answer: Mapped[str] = mapped_column(String(250))
 
 
-# create all models
+# Create all models
 async def async_main():
-
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
