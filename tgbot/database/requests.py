@@ -317,3 +317,53 @@ async def get_poll_creator_id(lobby_id: int) -> int | None:
             select(Poll.creator_id).where(Poll.id == lobby_id)
         )
         return result.scalar_one_or_none()
+
+
+from sqlalchemy import select, desc
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+async def get_last_poll_answers(session: AsyncSession, creator_tg_id: int):
+    """
+    Получает список ответов, имя и фамилию участников, и ID последнего опроса создателя.
+
+    :param session: Асинхронная сессия SQLAlchemy
+    :param creator_tg_id: TG ID создателя опросов
+    :return: Список словарей с ответами и участниками
+    """
+    # Подзапрос для ID последнего опроса
+    last_poll_subquery = (
+        select(Poll.id)
+        .where(Poll.creator_id == creator_tg_id)
+        .order_by(Poll.id.desc())
+        .limit(1)
+        .scalar_subquery()
+    )
+
+    # Основной запрос
+    query = (
+        select(
+            Answer.answer.label("answer"),
+            User.first_name.label("first_name"),
+            User.last_name.label("last_name"),
+            Poll.id.label("lobby_id"),
+        )
+        .join(PollParticipant, Answer.lobby_participant_id == PollParticipant.id)
+        .join(User, PollParticipant.user_tg_id == User.tg_id)
+        .join(Poll, Answer.lobby_id == Poll.id)
+        .where(Poll.id == last_poll_subquery)
+    )
+
+    # Выполнение запроса
+    results = await session.execute(query)
+
+    # Обработка результатов
+    return [
+        {
+            "lobby_id": row.lobby_id,
+            "answer": row.answer,
+            "first_name": row.first_name,
+            "last_name": row.last_name,
+        }
+        for row in results.fetchall()
+    ]
