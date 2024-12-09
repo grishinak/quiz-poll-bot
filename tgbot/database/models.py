@@ -19,8 +19,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    tg_id = mapped_column(BigInteger)
+    tg_id = mapped_column(BigInteger, primary_key=True)
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50), nullable=True)
 
@@ -31,7 +30,7 @@ class Question(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     question: Mapped[str] = mapped_column(String(250))
     answer: Mapped[str] = mapped_column(String(250))
-    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
 
 
 class Poll(Base):
@@ -39,7 +38,7 @@ class Poll(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
-    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
     is_collecting: Mapped[bool] = mapped_column(default=True)  # Новый флаг
 
 
@@ -48,7 +47,7 @@ class PollParticipant(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    user_tg_id: Mapped[int] = mapped_column(BigInteger)
+    user_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
 
 
 class Answer(Base):
@@ -67,3 +66,12 @@ async def async_main():
 
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
+
+
+# select answers.answer, polls.id
+# from answers
+# join polls on polls.id=answers.lobby_id
+# join questions on questions.id=polls.poll_id
+# join poll_participants on poll_participants.lobby_id=polls.id
+# join users on users.tg_id=poll_participants.user_tg_id
+# where polls.creator_id=1041947370
