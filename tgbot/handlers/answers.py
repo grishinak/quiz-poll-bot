@@ -4,6 +4,7 @@ from aiogram.filters import Command
 from database.requests import get_poll_data, get_last_poll_data, get_name_by_id
 
 import keyboards.answers as kb
+import database.requests as rq
 
 router = Router()
 
@@ -22,7 +23,7 @@ async def show_lobby_users_clb(callback: CallbackQuery):
     user_id = callback.from_user.id  # ID пользователя Telegram
 
     # Получаем данные о лобби, участниках и их ответах
-    poll_data = await get_poll_data(user_id)
+    poll_data = await rq.get_poll_data(user_id)
 
     if not poll_data:
         await callback.message.answer("У вас нет опросов с ответами участников.")
@@ -45,39 +46,30 @@ async def show_lobby_users_clb(callback: CallbackQuery):
 
 
 # output for just taken poll
-from aiogram.types import CallbackQuery
-
-
 @router.callback_query(F.data == "ans")
 async def show_last_lobby_users_clb(callback: CallbackQuery):
-    await callback.answer(
-        "Вы получаете список ответов для последнего опроса"
-    )  # Ответ пользователю
-
+    callback.answer("Вы получаете список ответов для последнего опроса")
     user_id = callback.from_user.id  # ID пользователя Telegram
     poll_info = await get_last_poll_data(user_id)
 
-    if not poll_info:
+    # Получаем данные о лобби, участниках и их ответах
+    poll_data = await get_poll_data(user_id)
+
+    if not poll_data:
         await callback.message.answer("Вы еще не проводили опросов.")
         return
 
-    poll_id = poll_info["poll_id"]
-    poll_data = poll_info["poll_data"]
+    # Формируем сообщение с данными
 
-    if not poll_data:
-        await callback.message.answer("У последнего опроса нет ответов.")
-        return
-
-    # Формирование ответа
-    response = (
-        f"Ответы участников в вашем последнем опросе:\n\n" f"🚪 Опрос #{poll_id}\n"
-    )
+    current_poll_id = None
 
     for data in poll_data:
-        tg_id = data[1]  # Получаем ID пользователя
-        full_name = await get_name_by_id(tg_id)
-        print(full_name)
-        response += f"\t\t👤 {full_name[0]} {full_name[1]}: {data[2]}\n"
+        if data["lobby_id"] != current_poll_id:
+            current_poll_id = data["lobby_id"]
+            response = f"Ответы участников в вашем последнем опросе (где хоть кто-то ответил):\n\n 🚪 Опрос #{current_poll_id} (Вопрос #{data['polls_id']}, '{data['question']}'):\n"
 
-    # Отправка ответа
+        response += (
+            f"\t\t 👤 {data['first_name']} {data['last_name']}: {data['answer']}\n"
+        )
+    # print(data)  # logging info
     await callback.message.answer(response)
