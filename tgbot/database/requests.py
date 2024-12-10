@@ -157,102 +157,16 @@ async def set_poll_participant(lobby_id: int, user_tg_id: int):
         return participant
 
 
-async def get_poll_question(poll_id: int):
+async def get_poll_question_with_id(poll_id: int):
     async with async_session() as session:
-        result = await session.execute(select(Question).filter(Question.id == poll_id))
-        polls = result.scalars().first()
-        if polls:
-            return polls.question
-        else:
-            return None
-
-
-# Получение участников лобби
-async def get_poll_participants(lobby_id: int):
-    async with async_session() as session:
-        result = await session.execute(
-            select(PollParticipant.user_tg_id).filter(
-                PollParticipant.lobby_id == lobby_id
-            )
+        poll_query = (
+            select(Question.question, Question.id)
+            .join(Poll, Poll.poll_id == Question.id)
+            .where(Poll.id == poll_id)
         )
-        return [row.user_tg_id for row in result.all()]
-
-
-async def get_poll_id_for_lobby(lobby_id: int):
-    async with async_session() as session:
-        # Выполняем запрос для получения poll_id, связанного с lobby_id
-        result = await session.execute(select(Poll).filter(Poll.id == lobby_id))
-        lobby = result.scalars().first()  # Извлекаем первый результат или None
-
-        # Проверяем, существует ли лобби и возвращаем poll_id
-        if lobby:
-            return lobby.poll_id
-        else:
-            return None
-
-
-# Сохранение ответа пользователя
-async def set_answer(lobby_id: int, participant_id: int, user_answer: str):
-    """
-    Сохраняет ответ пользователя в базе данных.
-
-    :param lobby_id: ID лобби, связанного с ответом.
-    :param participant_id: ID участника лобби.
-    :param user_answer: Ответ пользователя.
-    :return: Сохраненная запись ответа.
-    """
-    async with async_session() as session:
-        answer = Answer(
-            lobby_id=lobby_id, lobby_participant_id=participant_id, answer=user_answer
-        )
-        session.add(answer)
-        await session.commit()
-        return answer
-
-
-async def get_poll_by_id_and_creator(poll_id: int, creator_id: int):
-    """
-    Проверяет существование опроса с указанным ID и принадлежность создателю.
-    :param poll_id: ID опроса
-    :param creator_id: ID создателя
-    :return: Объект Question или None
-    """
-    async with async_session() as session:
-        async with session.begin():
-            result = await session.execute(
-                select(Question).where(
-                    Question.id == poll_id, Question.creator_id == creator_id
-                )
-            )
-            return result.scalar()
-
-
-# Проверка существования лобби
-async def check_poll_exists(lobby_id: int):
-    async with async_session() as session:
-        stmt = select(Poll).filter(Poll.id == lobby_id)
-        result = await session.execute(stmt)
-        return result.scalars().first() is not None
-
-
-# Проверка, является ли пользователь участником лобби
-async def check_if_participant_exists(lobby_id: int, user_tg_id: BigInteger):
-    async with async_session() as session:
-        stmt = select(PollParticipant).filter(
-            PollParticipant.lobby_id == lobby_id,
-            PollParticipant.user_tg_id == user_tg_id,
-        )
-        result = await session.execute(stmt)
-        return result.scalars().first() is not None
-
-
-# Добавление участника в лобби
-async def set_poll_participant(lobby_id: int, user_tg_id: int):
-    async with async_session() as session:
-        participant = PollParticipant(lobby_id=lobby_id, user_tg_id=user_tg_id)
-        session.add(participant)
-        await session.commit()
-        return participant
+        result = await session.execute(poll_query)
+        question_data = result.first()
+        return question_data
 
 
 async def get_poll_question(poll_id: int):
@@ -306,8 +220,6 @@ async def set_answer(lobby_id: int, participant_id: int, user_answer: str):
         session.add(answer)
         await session.commit()
         return answer
-
-    # select polls.id, answers.lobby_participant_id, answers.answer, users.first_name
 
 
 async def get_poll_data(creator_tg_id: int):
