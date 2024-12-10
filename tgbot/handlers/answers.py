@@ -1,7 +1,12 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
-from database.requests import get_poll_data, get_last_poll_data, get_name_by_id
+from database.requests import (
+    get_poll_data,
+    get_last_poll_data,
+    get_name_by_id,
+    get_all_poll_data,
+)
 
 import keyboards.answers as kb
 
@@ -17,30 +22,45 @@ async def show_poll_users(message: Message):
 
 
 @router.callback_query(F.data == "answers")
-async def show_lobby_users_clb(callback: CallbackQuery):
-    callback.answer("Вы получаете список ответов")
+async def show_all_lobby_users_clb(callback: CallbackQuery):
+    await callback.answer("Вы получаете список ответов для всех ваших опросов.")
+
     user_id = callback.from_user.id  # ID пользователя Telegram
+    poll_info = await get_all_poll_data(user_id)
 
-    # Получаем данные о лобби, участниках и их ответах
-    poll_data = await get_poll_data(user_id)
-
-    if not poll_data:
-        await callback.message.answer("У вас нет опросов с ответами участников.")
+    if not poll_info:
+        await callback.message.answer("Вы еще не проводили опросов.")
         return
 
-    # Формируем сообщение с данными
-    response = " Ответы участников в ваших опросах:\n\n"
+    all_poll_ids = poll_info["poll_id"]
+    poll_data = poll_info["poll_data"]
+
+    if not poll_data:
+        await callback.message.answer("У ваших опросов нет ответов.")
+        return
+
+    # Формирование ответа
+    response = "Ответы участников во всех ваших опросах:\n\n"
     current_poll_id = None
 
     for data in poll_data:
-        if data["lobby_id"] != current_poll_id:
-            current_poll_id = data["lobby_id"]
-            response += f"🚪 Опрос #{current_poll_id} (Вопрос #{data['polls_id']}, '{data['question']}'):\n"
+        poll_id = data[0]
+        tg_id = data[1]
+        answer = data[2]
 
-        response += (
-            f"\t\t 👤 {data['first_name']} {data['last_name']}: {data['answer']}\n"
-        )
-    # print(data) #logging info
+        # Если новый опрос, добавляем заголовок
+        if poll_id != current_poll_id:
+            current_poll_id = poll_id
+            response += f"\n🚪 Опрос #{poll_id}:\n"
+
+        # Получение имени участника
+        full_name = await get_name_by_id(tg_id)
+        if full_name:
+            response += f"\t\t👤 {full_name[0]} {full_name[1]}: {answer}\n"
+        else:
+            response += f"\t\t👤 Пользователь с ID {tg_id}: {answer}\n"
+
+    # Отправка ответа
     await callback.message.answer(response)
 
 

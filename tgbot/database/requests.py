@@ -1,6 +1,6 @@
 from database.models import async_session
 from database.models import User, Question, Poll, PollParticipant, Answer
-from sqlalchemy import select, insert, update, delete, BigInteger
+from sqlalchemy import select, insert, update, delete, BigInteger, desc, asc
 
 
 # func for setting user data from /start
@@ -428,14 +428,13 @@ async def get_poll_creator_id(lobby_id: int) -> int | None:
 # ORDER BY id DESC
 # LIMIT 1
 
+# select polls.id, answers.lobby_participant_id, answers.answer, users.first_name
 # from answers
 # join polls on polls.id=answers.lobby_id
 # left join users on users.tg_id=answers.lobby_participant_id
 
-# where lobby_id= last_poll
 
-from sqlalchemy import select, desc
-from sqlalchemy.ext.asyncio import AsyncSession
+# where lobby_id= last_poll
 
 
 async def get_last_poll_data(user_id: int):
@@ -443,7 +442,6 @@ async def get_last_poll_data(user_id: int):
     Получает данные о последнем опросе и ответах участников для заданного пользователя.
 
     :param user_id: ID пользователя Telegram, создавшего опрос.
-    :param session: Активная сессия SQLAlchemy.
     :return: Словарь с данными о последнем опросе или None, если данных нет.
     """
     async with async_session() as session:
@@ -477,17 +475,6 @@ async def get_last_poll_data(user_id: int):
         return {"poll_id": last_poll_id, "poll_data": poll_data}
 
 
-# async def get_name_by_id(tg_id: int):
-#     async with async_session() as session:
-#         async with session.begin():
-#             result = await session.execute(
-#                 select(User.first_name,User.last_name).where(
-#                     User.tg_id == tg_id
-#                 )
-#             )
-#             return result.scalar()
-
-
 async def get_name_by_id(tg_id: int):
     async with async_session() as session:
         result = await session.execute(
@@ -497,3 +484,40 @@ async def get_name_by_id(tg_id: int):
         if user:
             return user.first_name, user.last_name
         return None, None  # Возвращаем пустые значения, если пользователь не найден
+
+
+async def get_all_poll_data(user_id: int):
+    """
+    Получает данные о всех опросах и ответах участников для заданного пользователя.
+
+    :param user_id: ID пользователя Telegram, создавшего опрос.
+    :return: Словарь с данными о последнем опросе или None, если данных нет.
+    """
+    async with async_session() as session:
+        # Получение ID последнего опроса
+        all_poll_query = (
+            select(Poll.id)
+            .where(Poll.creator_id == user_id)
+            .order_by(asc(Poll.id))  # Упорядочиваем в прямом порядке
+        )
+        all_poll_result = await session.execute(all_poll_query)
+        all_poll_id = all_poll_result.scalars().all()
+        print(f"all_poll_result:{all_poll_result}")  # log
+        print(f"all_poll_id:{all_poll_id}")  # log
+        if not all_poll_id:
+            return None
+
+        # Получение данных об участниках и их ответах
+        poll_data_query = (
+            select(
+                Poll.id,
+                Answer.lobby_participant_id,
+                Answer.answer,
+            )
+            .join(Answer, Poll.id == Answer.lobby_id)
+            .where(Poll.id.in_(all_poll_id))
+        )
+        poll_data_result = await session.execute(poll_data_query)
+        poll_data = poll_data_result.all()
+        print(f"poll_data:{poll_data}")  # log
+        return {"poll_id": all_poll_id, "poll_data": poll_data}
