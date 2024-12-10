@@ -6,7 +6,7 @@ polls_menu = InlineKeyboardMarkup(
         [InlineKeyboardButton(text="Создать опрос", callback_data="create_poll")],
         [
             InlineKeyboardButton(text="Ваши опросы", callback_data="polls_list"),
-            InlineKeyboardButton(text="Ваши вопросы", callback_data="questions_list"),
+            # InlineKeyboardButton(text="Ваши вопросы", callback_data="questions_list"), # hided from interface
         ],
         [
             InlineKeyboardButton(
