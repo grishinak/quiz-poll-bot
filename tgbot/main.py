@@ -39,7 +39,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    #try:
-        asyncio.run(main())
-    #except Exception:
-    #    print(f"Error run bot: {Exception}")
+    # try:
+    asyncio.run(main())
+# except Exception:
+#    print(f"Error run bot: {Exception}")

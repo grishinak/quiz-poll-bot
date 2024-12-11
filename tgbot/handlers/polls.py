@@ -45,7 +45,9 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
             )
             return
 
-        poll_id = await rq.set_poll(question_id=int(question_id), creator_tg_id=int(user_id))
+        poll_id = await rq.set_poll(
+            question_id=int(question_id), creator_tg_id=int(user_id)
+        )
 
         await message.answer(
             f"Опрос #{poll_id} успешно создан! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",

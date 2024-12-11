@@ -42,7 +42,6 @@ class Poll(Base):
     is_collecting: Mapped[bool] = mapped_column(Boolean, default=True)  # Новый флаг
 
 
-
 class PollParticipant(Base):
     __tablename__ = "poll_participants"
 
@@ -57,7 +56,7 @@ class Answer(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
     lobby_participant_id: Mapped[BigInteger] = mapped_column(
-        ForeignKey("users.tg_id") #tg_id
+        ForeignKey("users.tg_id")  # tg_id
     )
     answer: Mapped[str] = mapped_column(String(250))
 
