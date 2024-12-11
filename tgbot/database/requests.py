@@ -85,7 +85,7 @@ async def set_poll(question_id: int, creator_tg_id: int):
 
 async def get_polls(user_id: int):
     """
-    Получает список лобби, созданных пользователем.
+    Получает список опросов, созданных пользователем.
 
     :param user_id: ID пользователя Telegram
     :return: Список словарей с данными лобби
@@ -114,8 +114,8 @@ async def set_poll_participant(poll_id: int, user_tg_id: BigInteger):
 
 async def get_poll_by_id_and_creator(question_id: int, creator_tg_id: int):
     """
-    Проверяет существование опроса с указанным ID и принадлежность создателю.
-    :param question_id: ID опроса
+    Получает вопрос с указанным ID и создателем.
+    :param question_id: ID вопроса
     :param creator_tg_id: ID создателя
     :return: Объект Question или None
     """
@@ -129,7 +129,7 @@ async def get_poll_by_id_and_creator(question_id: int, creator_tg_id: int):
             return result.scalar()
 
 
-# Проверка существования лобби
+# Проверка существования опроса
 async def check_poll_exists(poll_id: int):
     async with async_session() as session:
         stmt = select(Poll).filter(Poll.id == poll_id)
@@ -137,7 +137,7 @@ async def check_poll_exists(poll_id: int):
         return result.scalars().first() is not None
 
 
-# Проверка, является ли пользователь участником лобби
+# Проверка, является ли пользователь участником опроса
 async def check_if_participant_exists(poll_id: int, user_tg_id: BigInteger):
     async with async_session() as session:
         stmt = select(PollParticipant).filter(
@@ -148,7 +148,7 @@ async def check_if_participant_exists(poll_id: int, user_tg_id: BigInteger):
         return result.scalars().first() is not None
 
 
-# Добавление участника в лобби
+# Добавление участника в опрос
 async def set_poll_participant(poll_id: int, user_tg_id: int):
     async with async_session() as session:
         participant = PollParticipant(poll_id=poll_id, user_tg_id=user_tg_id)
@@ -181,7 +181,7 @@ async def get_poll_question(question_id: int):
             return None
 
 
-# Получение участников лобби
+# Получение участников опроса
 async def get_poll_participants(poll_id: int):
     async with async_session() as session:
         result = await session.execute(
@@ -198,7 +198,7 @@ async def get_poll_id_for_lobby(poll_id: int):
         result = await session.execute(select(Poll).filter(Poll.id == poll_id))
         lobby = result.scalars().first()  # Извлекаем первый результат или None
 
-        # Проверяем, существует ли лобби и возвращаем question_id
+        # Проверяем, существует ли опрос и возвращаем question_id
         if lobby:
             return lobby.question_id
         else:
@@ -210,8 +210,8 @@ async def set_answer(poll_id: int, participant_id: int, user_answer: str):
     """
     Сохраняет ответ пользователя в базе данных.
 
-    :param poll_id: ID лобби, связанного с ответом.
-    :param participant_id: ID участника лобби.
+    :param poll_id: ID опроса, связанного с ответом.
+    :param participant_id: ID участника опроса.
     :param user_answer: Ответ пользователя.
     :return: Сохраненная запись ответа.
     """
@@ -331,24 +331,6 @@ async def get_poll_creator_id(poll_id: int) -> int | None:
             select(Poll.creator_tg_id).where(Poll.id == poll_id)
         )
         return result.scalar_one_or_none()
-
-
-# worked!!!
-
-# last_poll=
-# SELECT id
-# FROM polls
-# WHERE creator_tg_id = :creator tg_id
-# ORDER BY id DESC
-# LIMIT 1
-
-# select polls.id, answers.lobby_participant_id, answers.answer, users.first_name
-# from answers
-# join polls on polls.id=answers.poll_id
-# left join users on users.tg_id=answers.lobby_participant_id
-
-
-# where poll_id= last_poll
 
 
 async def get_last_poll_data(user_id: int):

@@ -1,6 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# button to create_question fsm from /start command
 drop_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [

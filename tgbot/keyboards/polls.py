@@ -6,6 +6,7 @@ polls_menu = InlineKeyboardMarkup(
         [InlineKeyboardButton(text="Создать опрос", callback_data="create_poll")],
         [
             InlineKeyboardButton(text="Ваши опросы", callback_data="polls_list"),
+            # Была скрыта, к ней и так есть доступ через \questions
             # InlineKeyboardButton(text="Ваши вопросы", callback_data="questions_list"), # hided from interface
         ],
         [
@@ -94,12 +95,6 @@ end_menu = InlineKeyboardMarkup(
 
 participants_end_menu = InlineKeyboardMarkup(
     inline_keyboard=[
-        # TODO: we may send participants results?
-        #     [
-        #         InlineKeyboardButton(
-        #             text="Получить список ответов", callback_data="answers"
-        #         )
-        #     ],
         [
             InlineKeyboardButton(
                 text="Подключиться к новому опросу", callback_data="connect_poll"
@@ -113,9 +108,6 @@ participants_end_menu = InlineKeyboardMarkup(
     ]
 )
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-# button for check states in fsm create_question
 check_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [

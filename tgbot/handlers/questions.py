@@ -33,7 +33,7 @@ async def process_create_poll_clb(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Вы начали создание вопроса!")  # message in chat
 
     # await state.set_state(CreateQuestion.name)  # goes to state
-    # await callback.message.answer("Введите название опроса:")
+    # await callback.message.answer("Введите название вопроса:")
 
     await state.set_state(CreateQuestion.question)  # goes to state
     await callback.message.answer("Введите вопрос:")
@@ -115,17 +115,17 @@ async def show_poll_list_clb(callback: CallbackQuery):
     # Получаем список опросов из базы данных
     questions = await rq.get_questions(user_id)
 
-    # Если у пользователя нет созданных опросов
+    # Если у пользователя нет созданных вопросов
     if not questions:
         await callback.message.answer("У вас нет созданных вопросов.")
 
     else:
-        # Формируем сообщение со списком опросов
+        # Формируем сообщение со списком вопросов
         response = "Ваши созданные вопросы:\n\n"
         for question_id, poll_question, poll_answer in questions:
             response += (
                 f"📝 Вопрос #{question_id}: {poll_question}\n\tОтвет: {poll_answer}\n\n"
             )
 
-        # Отправляем пользователю список опросов
+        # Отправляем пользователю список вопросов
         await callback.message.answer(response, reply_markup=kb.create_poll)

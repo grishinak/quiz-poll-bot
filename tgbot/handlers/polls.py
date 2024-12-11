@@ -9,7 +9,7 @@ import keyboards.polls as kb
 
 router = Router()
 
-# /question handler
+# /polls handler
 @router.message(Command("polls"))
 async def cmd_help(message: Message):
     await message.answer(
@@ -17,7 +17,7 @@ async def cmd_help(message: Message):
     )
 
 
-# Класс FSM для создания лобби
+# Класс FSM для создания опроса
 class CreatePoll(StatesGroup):
     polls = State()
 
@@ -196,6 +196,10 @@ async def give_answer_handler(callback: CallbackQuery, state: FSMContext):
 async def process_answer(message: Message, state: FSMContext):
     await state.update_data(answer=message.text)
     data = await state.get_data()  # get all data about polls from user
+
+    # Проверка на правильный ввод пользователем своего ответа
+    # Скрыта, дабы сократить кол-во действий на ответ
+
     #     await message.answer(
     #         f"Все ли верно?\n\nОтвет: {data['answer']}",
     #         reply_markup=kb.check_menu,  # buttons for check
@@ -216,6 +220,7 @@ async def process_answer(message: Message, state: FSMContext):
     # async def process_check_true(callback: CallbackQuery, state: FSMContext):
     #     await callback.answer("Успешно")  # alert
     #     await callback.message.edit_text("Данные верны.", reply_markup=None)
+
     data = await state.get_data()
 
     participant_id = message.from_user.id
@@ -227,7 +232,7 @@ async def process_answer(message: Message, state: FSMContext):
                 user_answer=data["answer"],
             )
 
-            # Отправляем сообщение пользователю о том, что опрос сохранен
+            # Отправляем сообщение пользователю о том, что ответ сохранен
             await message.answer(f"Ваш ответ '{data['answer']}' сохранен!")
         else:
             await message.answer(f"Время для ответа вышло. Ваш ответ не сохранен.")

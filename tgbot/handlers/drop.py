@@ -9,7 +9,7 @@ import database.requests as rq
 router = Router()
 start_text = """С помощью этого бота Вы можете проводить опросы.\n"""
 
-# /start handler
+
 @router.message(Command("drop"))
 async def cmd_drop(message: Message):
     """drop command handler"""
@@ -27,13 +27,11 @@ async def process_create_lobby_clb(callback: CallbackQuery):
     )
 
 
-# Обработка нажатия кнопки (from answer) и переход в состояние
 @router.callback_query(F.data == "check_del_false")
 async def process_check_false(callback: CallbackQuery):
     await callback.message.edit_text("Отмена удаления вопросов и опросов.")
 
 
-# Обработка нажатия кнопки (from answer) и переход в состояние
 @router.callback_query(F.data == "check_del_true")
 async def process_check_true(callback: CallbackQuery):
     await callback.answer("Удаление списка вопросов и опросов")  # alert

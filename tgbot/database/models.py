@@ -66,12 +66,3 @@ async def async_main():
 
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
-
-
-# select answers.answer, polls.id
-# from answers
-# join polls on polls.id=answers.poll_id
-# join questions on questions.id=polls.question_id
-# join poll_participants on poll_participants.poll_id=polls.id
-# join users on users.tg_id=poll_participants.user_tg_id
-# where polls.creator_tg_id=1041947370

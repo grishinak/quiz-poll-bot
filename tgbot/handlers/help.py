@@ -11,6 +11,7 @@ help_text = """🤖 Список команд:\n\
 \n/answers - 📩 Список ответов в ваших опросах \
 \n/drop - 🗑️ Сбросить сохраненные данные \
 """
+
 # /help handler
 @router.message(Command("help"))
 async def cmd_help(message: Message):
