@@ -81,13 +81,13 @@ async def process_check_true(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Данные верны.")
     data = await state.get_data()
 
-    creator_id = callback.from_user.id
+    creator_tg_id = callback.from_user.id
     try:
         # Сохраняем опрос в базе данных
-        poll_id = await rq.set_question(
+        question_id = await rq.set_question(
             question=data["question"],
             answer=data["answer"],
-            creator_id=creator_id,
+            creator_tg_id=creator_tg_id,
         )
 
         # Отправляем сообщение пользователю о том, что опрос сохранен
@@ -122,9 +122,9 @@ async def show_poll_list_clb(callback: CallbackQuery):
     else:
         # Формируем сообщение со списком опросов
         response = "Ваши созданные вопросы:\n\n"
-        for poll_id, poll_question, poll_answer in questions:
+        for question_id, poll_question, poll_answer in questions:
             response += (
-                f"📝 Вопрос #{poll_id}: {poll_question}\n\tОтвет: {poll_answer}\n\n"
+                f"📝 Вопрос #{question_id}: {poll_question}\n\tОтвет: {poll_answer}\n\n"
             )
 
         # Отправляем пользователю список опросов

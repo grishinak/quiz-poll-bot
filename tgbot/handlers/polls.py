@@ -34,22 +34,22 @@ async def process_create_lobby_clb(callback: CallbackQuery, state: FSMContext):
 
 @router.message(CreatePoll.polls)
 async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
-    poll_id = message.text.strip()
+    question_id = message.text.strip()
     user_id = message.from_user.id
 
     try:
-        polls = await rq.get_poll_by_id_and_creator(poll_id, user_id)
+        polls = await rq.get_poll_by_id_and_creator(question_id, user_id)
         if not polls:
             await message.answer(
                 "Вопрос с таким ID не найден среди ваших вопросов. Попробуйте снова."
             )
             return
 
-        lobby_id = await rq.set_poll(poll_id=int(poll_id), creator_id=user_id)
+        poll_id = await rq.set_poll(question_id=int(question_id), creator_tg_id=user_id)
 
         await message.answer(
-            f"Опрос #{lobby_id} успешно создан! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",
-            reply_markup=kb.create_start_stop_poll_keyboard(lobby_id),
+            f"Опрос #{poll_id} успешно создан! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",
+            reply_markup=kb.create_start_stop_poll_keyboard(poll_id),
         )
         ###
 
@@ -63,18 +63,18 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
 @router.callback_query(lambda call: call.data.startswith("start_poll"))
 async def start_poll_handler(callback: CallbackQuery, bot: Bot):
     await callback.answer("Сбор ответов начат.")
-    lobby_id = int(callback.data.split(":")[1])
+    poll_id = int(callback.data.split(":")[1])
 
-    if not await rq.check_poll_exists(lobby_id):
+    if not await rq.check_poll_exists(poll_id):
         await callback.message.edit_text("Опроса не существует.")
         return
 
     # Установить флаг "сбор ответов" в True
-    await rq.update_poll_collecting_status(lobby_id, True)
+    await rq.update_poll_collecting_status(poll_id, True)
 
-    poll_id = await rq.get_poll_id_for_lobby(lobby_id)
+    poll_id = await rq.get_poll_id_for_lobby(poll_id)
     question = await rq.get_poll_question(poll_id)
-    participants = await rq.get_poll_participants(lobby_id)
+    participants = await rq.get_poll_participants(poll_id)
 
     for participant_id in participants:
         await bot.send_message(
@@ -83,19 +83,19 @@ async def start_poll_handler(callback: CallbackQuery, bot: Bot):
 
     await callback.message.edit_text(
         "Опрос начат! Участники получили вопрос.",
-        reply_markup=kb.create_stop_poll_keyboard(lobby_id),
+        reply_markup=kb.create_stop_poll_keyboard(poll_id),
     )
 
 
 @router.callback_query(lambda call: call.data.startswith("stop_poll"))
 async def stop_poll_handler(callback: CallbackQuery, bot: Bot):
     await callback.answer("Сбор ответов закончен.")
-    lobby_id = int(callback.data.split(":")[1])
+    poll_id = int(callback.data.split(":")[1])
 
     # Установить флаг "сбор ответов" в False
-    await rq.update_poll_collecting_status(lobby_id, False)
+    await rq.update_poll_collecting_status(poll_id, False)
 
-    participants = await rq.get_poll_participants(lobby_id)
+    participants = await rq.get_poll_participants(poll_id)
     for participant_id in participants:
         await bot.send_message(
             participant_id,
@@ -122,8 +122,8 @@ async def show_polls_list_clb(callback: CallbackQuery):
     else:
         # Формируем сообщение со списком опросов
         response = "Ваши созданные опросы:\n\n"
-        for lobby_id, poll_id, creator_id in polls:
-            response += f" - Опрос #{lobby_id} с вопросом #{poll_id}\n"
+        for poll_id, question_id, creator_tg_id in polls:
+            response += f" - Опрос #{poll_id} с вопросом #{question_id}\n"
 
         # Отправляем пользователю список опросов
         await callback.message.answer(response)
@@ -147,32 +147,32 @@ async def clb_connect_poll(callback: CallbackQuery, state: FSMContext):
 @router.message(PollState.waiting_for_poll_id)
 async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
     try:
-        lobby_id = int(message.text)
+        poll_id = int(message.text)
     except ValueError:
         await message.answer("Пожалуйста, введите действительный ID опроса.")
         return
 
-    if not await rq.check_poll_exists(lobby_id):
+    if not await rq.check_poll_exists(poll_id):
         await message.answer("Опроса не существует.")
         return
 
-    if await rq.check_if_participant_exists(lobby_id, message.from_user.id):
+    if await rq.check_if_participant_exists(poll_id, message.from_user.id):
         await message.answer("Вы уже подключены к этому опросу!")
         return
 
     # Добавляем участника
-    await rq.set_poll_participant(lobby_id, message.from_user.id)
-    await state.update_data(lobby_id=message.text)
-    await message.answer(f"Вы успешно подключились к опросу #{lobby_id}!")
+    await rq.set_poll_participant(poll_id, message.from_user.id)
+    await state.update_data(poll_id=message.text)
+    await message.answer(f"Вы успешно подключились к опросу #{poll_id}!")
 
     # Получаем идентификатор создателя
-    creator_id = await rq.get_poll_creator_id(lobby_id)
+    creator_tg_id = await rq.get_poll_creator_id(poll_id)
 
     # Уведомляем создателя
-    if creator_id:
+    if creator_tg_id:
         await bot.send_message(
-            creator_id,
-            f"К вашему опросу #{lobby_id} подключился новый участник: {message.from_user.full_name}.",
+            creator_tg_id,
+            f"К вашему опросу #{poll_id} подключился новый участник: {message.from_user.full_name}.",
         )
 
     await state.set_state(PollState.waiting_for_start_poll)
@@ -220,9 +220,9 @@ async def process_answer(message: Message, state: FSMContext):
 
     participant_id = message.from_user.id
     try:
-        if await rq.is_poll_collecting(data["lobby_id"]):
+        if await rq.is_poll_collecting(data["poll_id"]):
             answer_id = await rq.set_answer(
-                lobby_id=data["lobby_id"],
+                poll_id=data["poll_id"],
                 participant_id=participant_id,
                 user_answer=data["answer"],
             )

@@ -30,15 +30,15 @@ class Question(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     question: Mapped[str] = mapped_column(String(250))
     answer: Mapped[str] = mapped_column(String(250))
-    creator_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
+    creator_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
 
 
 class Poll(Base):
     __tablename__ = "polls"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    poll_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
-    creator_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    creator_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
     is_collecting: Mapped[bool] = mapped_column(default=True)  # Новый флаг
 
 
@@ -46,7 +46,7 @@ class PollParticipant(Base):
     __tablename__ = "poll_participants"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
+    poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
     user_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
 
 
@@ -54,7 +54,7 @@ class Answer(Base):
     __tablename__ = "answers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    lobby_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
+    poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
     lobby_participant_id: Mapped[int] = mapped_column(
         ForeignKey("poll_participants.id")
     )
@@ -70,8 +70,8 @@ async def async_main():
 
 # select answers.answer, polls.id
 # from answers
-# join polls on polls.id=answers.lobby_id
-# join questions on questions.id=polls.poll_id
-# join poll_participants on poll_participants.lobby_id=polls.id
+# join polls on polls.id=answers.poll_id
+# join questions on questions.id=polls.question_id
+# join poll_participants on poll_participants.poll_id=polls.id
 # join users on users.tg_id=poll_participants.user_tg_id
-# where polls.creator_id=1041947370
+# where polls.creator_tg_id=1041947370
