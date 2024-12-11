@@ -34,8 +34,8 @@ async def process_create_lobby_clb(callback: CallbackQuery, state: FSMContext):
 
 @router.message(CreatePoll.polls)
 async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
-    question_id = message.text.strip()
-    user_id = message.from_user.id
+    question_id = int(message.text.strip())
+    user_id = int(message.from_user.id)
 
     try:
         polls = await rq.get_poll_by_id_and_creator(question_id, user_id)
@@ -45,7 +45,7 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
             )
             return
 
-        poll_id = await rq.set_poll(question_id=int(question_id), creator_tg_id=user_id)
+        poll_id = await rq.set_poll(question_id=int(question_id), creator_tg_id=int(user_id))
 
         await message.answer(
             f"Опрос #{poll_id} успешно создан! Поделитесь этим номером с участниками. \n\nНе начинайте опрос пока они не подключатся.",
@@ -225,9 +225,9 @@ async def process_answer(message: Message, state: FSMContext):
 
     participant_id = message.from_user.id
     try:
-        if await rq.is_poll_collecting(data["poll_id"]):
+        if await rq.is_poll_collecting(int(data["poll_id"])):
             answer_id = await rq.set_answer(
-                poll_id=data["poll_id"],
+                poll_id=int(data["poll_id"]),
                 participant_id=participant_id,
                 user_answer=data["answer"],
             )

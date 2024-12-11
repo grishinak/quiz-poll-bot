@@ -2,7 +2,7 @@
 import os
 from dotenv import load_dotenv
 
-from sqlalchemy import BigInteger, String, ForeignKey
+from sqlalchemy import BigInteger, String, ForeignKey, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 
@@ -19,7 +19,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    tg_id = mapped_column(BigInteger, primary_key=True)
+    tg_id = mapped_column(BigInteger, primary_key=True)  # Add unique constraint
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50), nullable=True)
 
@@ -38,8 +38,9 @@ class Poll(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
-    creator_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
-    is_collecting: Mapped[bool] = mapped_column(default=True)  # Новый флаг
+    creator_tg_id: Mapped[BigInteger] = mapped_column(ForeignKey("users.tg_id"))
+    is_collecting: Mapped[bool] = mapped_column(Boolean, default=True)  # Новый флаг
+
 
 
 class PollParticipant(Base):
@@ -47,7 +48,7 @@ class PollParticipant(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    user_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
+    user_tg_id: Mapped[BigInteger] = mapped_column(ForeignKey("users.tg_id"))
 
 
 class Answer(Base):
@@ -55,8 +56,8 @@ class Answer(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    lobby_participant_id: Mapped[int] = mapped_column(
-        ForeignKey("poll_participants.id")
+    lobby_participant_id: Mapped[BigInteger] = mapped_column(
+        ForeignKey("users.tg_id") #tg_id
     )
     answer: Mapped[str] = mapped_column(String(250))
 

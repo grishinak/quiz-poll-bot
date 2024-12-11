@@ -206,7 +206,7 @@ async def get_poll_id_for_lobby(poll_id: int):
 
 
 # Сохранение ответа пользователя
-async def set_answer(poll_id: int, participant_id: int, user_answer: str):
+async def set_answer(poll_id: int, participant_id: BigInteger, user_answer: str):
     """
     Сохраняет ответ пользователя в базе данных.
 
