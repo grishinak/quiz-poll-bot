@@ -147,7 +147,7 @@ async def clb_connect_poll(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(PollState.waiting_for_poll_id)
-async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
+async def process_poll_id_connect(message: Message, state: FSMContext, bot: Bot):
     try:
         poll_id = int(message.text)
     except ValueError:
@@ -181,7 +181,7 @@ async def process_poll_id(message: Message, state: FSMContext, bot: Bot):
 
 
 @router.message(PollState.waiting_for_start_poll)
-async def process_answer(message: Message, state: FSMContext):
+async def process_answer_before_start(message: Message, state: FSMContext):
     await message.answer("Организатор еще не начал опрос, подождите.")
 
 

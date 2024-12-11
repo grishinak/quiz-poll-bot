@@ -148,15 +148,6 @@ async def check_if_participant_exists(poll_id: int, user_tg_id: BigInteger):
         return result.scalars().first() is not None
 
 
-# Добавление участника в опрос
-async def set_poll_participant(poll_id: int, user_tg_id: int):
-    async with async_session() as session:
-        participant = PollParticipant(poll_id=poll_id, user_tg_id=user_tg_id)
-        session.add(participant)
-        await session.commit()
-        return participant
-
-
 async def get_poll_question_with_id(question_id: int):
     async with async_session() as session:
         poll_query = (
