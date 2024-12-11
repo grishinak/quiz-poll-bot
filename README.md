@@ -28,6 +28,7 @@ Repeat!
 
 ## Used technologies
 - Python
+- aiogram
 - SQLalchemy
 - GitHub Actions
 
