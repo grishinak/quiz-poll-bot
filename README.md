@@ -1,14 +1,17 @@
 [![Check code style](https://github.com/grishinak/quiz-poll-bot/actions/workflows/code_style.yml/badge.svg)](https://github.com/grishinak/quiz-poll-bot/actions/workflows/code_style.yml)
 [![Code style](https://img.shields.io/badge/Code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e3adebfaf4564a20a6edd979f8610cb5)](https://app.codacy.com/gh/grishinak/quiz-poll-bot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
----
-# quiz-poll-bot
-Telegram bot for educational purposes with PostgreSQL and SQLalchemy to run polls.
 
 ---
+
+# quiz-poll-bot
+Telegram bot for educational purposes with SQLite3 and SQLalchemy to run polls.
+
 > Educational practice of the 3-rd semester of St. Petersburg State University
 
+---
 # [Bot](https://t.me/inforoo_bot?start)
+@inforoo_bot
 
 ## What it can do?
 
