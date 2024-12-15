@@ -55,9 +55,7 @@ class Answer(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"))
-    lobby_participant_id: Mapped[int] = mapped_column(
-        ForeignKey("poll_participants.id")
-    )
+    user_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"))
     answer: Mapped[str] = mapped_column(String(250))
 
 

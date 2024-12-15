@@ -216,9 +216,7 @@ async def set_answer(poll_id: int, participant_id: int, user_answer: str):
     :return: Сохраненная запись ответа.
     """
     async with async_session() as session:
-        answer = Answer(
-            poll_id=poll_id, lobby_participant_id=participant_id, answer=user_answer
-        )
+        answer = Answer(poll_id=poll_id, user_tg_id=participant_id, answer=user_answer)
         session.add(answer)
         await session.commit()
         return answer
@@ -359,7 +357,7 @@ async def get_last_poll_data(user_id: int):
         poll_data_query = (
             select(
                 Poll.id,
-                Answer.lobby_participant_id,
+                Answer.user_tg_id,
                 Answer.answer,
             )
             .join(Answer, Poll.id == Answer.poll_id)
@@ -407,7 +405,7 @@ async def get_all_poll_data(user_id: int):
         poll_data_query = (
             select(
                 Poll.id,
-                Answer.lobby_participant_id,
+                Answer.user_tg_id,
                 Answer.answer,
             )
             .join(Answer, Poll.id == Answer.poll_id)
